@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ionix.Utils", "ionix.Utils\ionix.Utils.csproj", "{5BB35030-E8E1-4640-A6B2-314BC898206E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ionix.Data", "ionix.Data\ionix.Data.csproj", "{42B88499-1FA8-4AC0-BD11-40BA38D78F59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ionixTests", "ionixTests\ionixTests.csproj", "{D4722A5A-7297-4F80-A98B-5CC22C37E4A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ionix.Data.SqlServer", "ionix.Data.SqlServer\ionix.Data.SqlServer.csproj", "{548C5092-AFB3-4F82-A3BD-F75F28245B54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ionix.Data.Oracle", "ionix.Data.Oracle\ionix.Data.Oracle.csproj", "{4BE10149-AE52-40D2-9479-BBAC038A13B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ionix.Data.PostgreSql", "ionix.Data.PostgreSql\ionix.Data.PostgreSql.csproj", "{5E86F592-213F-4C89-975D-541455DB3E2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ionix.Data.SQLite", "ionix.Data.SQLite\ionix.Data.SQLite.csproj", "{28ED9D67-EEAF-4EAC-A986-0FEC4C6389FC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5BB35030-E8E1-4640-A6B2-314BC898206E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BB35030-E8E1-4640-A6B2-314BC898206E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BB35030-E8E1-4640-A6B2-314BC898206E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BB35030-E8E1-4640-A6B2-314BC898206E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42B88499-1FA8-4AC0-BD11-40BA38D78F59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42B88499-1FA8-4AC0-BD11-40BA38D78F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42B88499-1FA8-4AC0-BD11-40BA38D78F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42B88499-1FA8-4AC0-BD11-40BA38D78F59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4722A5A-7297-4F80-A98B-5CC22C37E4A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4722A5A-7297-4F80-A98B-5CC22C37E4A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4722A5A-7297-4F80-A98B-5CC22C37E4A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4722A5A-7297-4F80-A98B-5CC22C37E4A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{548C5092-AFB3-4F82-A3BD-F75F28245B54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{548C5092-AFB3-4F82-A3BD-F75F28245B54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{548C5092-AFB3-4F82-A3BD-F75F28245B54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{548C5092-AFB3-4F82-A3BD-F75F28245B54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BE10149-AE52-40D2-9479-BBAC038A13B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BE10149-AE52-40D2-9479-BBAC038A13B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BE10149-AE52-40D2-9479-BBAC038A13B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BE10149-AE52-40D2-9479-BBAC038A13B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E86F592-213F-4C89-975D-541455DB3E2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E86F592-213F-4C89-975D-541455DB3E2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E86F592-213F-4C89-975D-541455DB3E2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E86F592-213F-4C89-975D-541455DB3E2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28ED9D67-EEAF-4EAC-A986-0FEC4C6389FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28ED9D67-EEAF-4EAC-A986-0FEC4C6389FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28ED9D67-EEAF-4EAC-A986-0FEC4C6389FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28ED9D67-EEAF-4EAC-A986-0FEC4C6389FC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
