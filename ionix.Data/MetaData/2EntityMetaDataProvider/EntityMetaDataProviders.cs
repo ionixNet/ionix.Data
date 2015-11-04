@@ -10,9 +10,9 @@
     using System.Collections.Generic;
 
 
-    public abstract class EntityMetaDataProviderBase : IEntityMetaDataProvider
+    public abstract class EntityMetaDataProviderBase: IEntityMetaDataProvider
     {
-        private static readonly IDictionary<Type, IEntityMetaData> _cache = new Dictionary<Type, IEntityMetaData>();//new ConcurrentDictionary<Type, IEntityMetaData>();// new Dictionary<Type, IEntityMetaData>(); 
+        private static readonly IDictionary<Type, Dictionary<Type, IEntityMetaData>> _cache = new Dictionary<Type, Dictionary<Type, IEntityMetaData>>();//new ConcurrentDictionary<Type, IEntityMetaData>();// new Dictionary<Type, IEntityMetaData>(); 
 
         protected virtual bool IsMapped(PropertyInfo pi)
         {
@@ -67,8 +67,16 @@
         {
             lock (syncRoot)
             {
+                Type derivedType = this.GetType();
+                Dictionary<Type, IEntityMetaData> tempCache;
+                if (!_cache.TryGetValue(derivedType, out tempCache))
+                {
+                    tempCache = new Dictionary<Type, IEntityMetaData>();
+                   _cache.Add(derivedType, tempCache);
+                }
+
                 IEntityMetaData metaData;
-                if (!_cache.TryGetValue(entityType, out metaData))
+                if (!tempCache.TryGetValue(entityType, out metaData))
                 {
                     EntityMetaData temp = new EntityMetaData(entityType);
                     foreach (PropertyInfo pi in entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
@@ -82,7 +90,7 @@
 
                     this.SetExtendedMetaData(temp);
 
-                    _cache.Add(entityType, temp);
+                    tempCache.Add(entityType, temp);
                     metaData = temp;
                 }
 
@@ -140,51 +148,6 @@
             {
                 schema.IsKey = true;
             }
-        }
-    }
-
-    public delegate void SetExtendedSchemaMethod(PropertyInfo pi, SchemaInfo schema);
-    public delegate void SetExtendedMetaDataMethod(EntityMetaData metaData);
-    public sealed class StrategyMetaDataProvider<TEntity> : EntityMetaDataProviderBase
-    {
-        private readonly SetExtendedSchemaMethod set;
-        private readonly Func<PropertyInfo, bool> isMappedMethod;
-        private readonly SetExtendedMetaDataMethod setExtendedMetaDataMethod;
-        public StrategyMetaDataProvider(SetExtendedSchemaMethod set, Func<PropertyInfo, bool> isMappedMethod, SetExtendedMetaDataMethod setExtendedMetaDataMethod)
-        {
-            if (null == set)
-                throw new ArgumentNullException(nameof(set));
-
-            this.set = set;
-            this.isMappedMethod = isMappedMethod;
-            this.setExtendedMetaDataMethod = setExtendedMetaDataMethod;
-        }
-        public StrategyMetaDataProvider(SetExtendedSchemaMethod set, Func<PropertyInfo, bool> isMappedMethod)
-            : this(set, isMappedMethod, null)
-        { }
-        public StrategyMetaDataProvider(SetExtendedSchemaMethod set)
-            : this(set, null, null)
-        { }
-
-
-        protected override void SetExtendedSchema(SchemaInfo schema, PropertyInfo pi)
-        {
-            this.set(pi, schema);
-        }
-        protected override bool IsMapped(PropertyInfo pi)
-        {
-            if (base.IsMapped(pi))
-            {
-                if (null != this.isMappedMethod)
-                    return this.isMappedMethod(pi);
-                return true;
-            }
-            return false;
-        }
-        protected override void SetExtendedMetaData(EntityMetaData metaData)
-        {
-            if (null != this.setExtendedMetaDataMethod)
-                this.setExtendedMetaDataMethod(metaData);
         }
     }
 }
