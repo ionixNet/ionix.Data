@@ -51,7 +51,7 @@
             if (null != repository && null != where)
             {
                 FluentSelect<TEntity> select = new FluentSelect<TEntity>(where.ParameterPrefix);
-                select.SelectAll().Where(where);
+                select.AllColumns().Where(where);
                 return repository.Query(select.ToQuery());
             }
             return new List<TEntity>();
@@ -63,7 +63,7 @@
             if (null != repository && null != where)
             {
                 FluentSelect<TEntity> select = new FluentSelect<TEntity>(where.ParameterPrefix);
-                select.SelectAll().Where(where);
+                select.AllColumns().Where(where);
                 return repository.QuerySingle(select.ToQuery());
             }
             return null;

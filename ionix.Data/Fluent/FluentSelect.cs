@@ -35,23 +35,12 @@
         }
 
 
-        public FluentSelect<TEntity> SelectAll()
+        public FluentSelect<TEntity> AllColumns()
         {
-            if (this.columns.Count != 0)
-                throw new InvalidOperationException("Columns not empty");
-
-            this.select.Text.Append("SELECT * FROM ");
-            this.select.Text.Append(this.TableName);
+            this.columns.Add("*");
             return this;
         }
-        public FluentSelect<TEntity> Select(SqlQuery customQuery)
-        {
-            if (this.columns.Count != 0)
-                throw new InvalidOperationException("Columns not empty");
 
-            this.select.Combine(customQuery);
-            return this;
-        }
         public FluentSelect<TEntity> Column(params Expression<Func<TEntity, object>>[] exps)
         {
             if (!exps.IsEmptyList())
@@ -65,6 +54,15 @@
                     }
                 }
             }
+            return this;
+        }
+
+        public FluentSelect<TEntity> Custom(SqlQuery customQuery)
+        {
+            if (this.columns.Count != 0)
+                throw new InvalidOperationException("Columns not empty");
+
+            this.select.Combine(customQuery);
             return this;
         }
 

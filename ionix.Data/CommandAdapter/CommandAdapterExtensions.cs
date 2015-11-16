@@ -425,7 +425,7 @@
             if (null != adapter && null != where)
             {
                 FluentSelect<TEntity> select = new FluentSelect<TEntity>(where.ParameterPrefix);
-                select.SelectAll().Where(where);
+                select.AllColumns().Where(where);
                 return adapter.QuerySingle<TEntity>(select.ToQuery());
             }
             return default(TEntity);
@@ -448,7 +448,7 @@
             if (null != adapter && null != where)
             {
                 FluentSelect<TEntity> select = new FluentSelect<TEntity>(where.ParameterPrefix);
-                select.SelectAll().Where(where);
+                select.AllColumns().Where(where);
                 return adapter.Query<TEntity>(select.ToQuery());
             }
             return new List<TEntity>();
