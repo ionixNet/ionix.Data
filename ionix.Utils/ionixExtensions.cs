@@ -7,6 +7,8 @@
     using System.Runtime.Serialization.Formatters.Binary;
     using System.Threading;
     using System.Linq;
+    using Reflection;
+
 
     public static class ionixExtensions
     {
@@ -215,6 +217,26 @@
             if (null != values && null != action)
                 foreach (T obj in values)
                     action(obj);
+        }
+
+        public static object IfNullSetEmpty<TTarget>(this object value)
+        {
+            if (null == value)
+            {
+                Type targetType = typeof (TTarget);
+                if (targetType == CachedTypes.String)
+                    return String.Empty;
+                else if (targetType.IsNullableType())
+                {
+                    Type genericType = targetType.GetGenericArguments()[0];
+                    return Activator.CreateInstance(genericType);
+                }
+                else if (targetType == CachedTypes.ByteArray)
+                    return new byte[0];
+                else
+                    throw new NotSupportedException(targetType.FullName);
+            }
+            return value;
         }
     }
 }
