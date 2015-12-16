@@ -1,8 +1,7 @@
-﻿using ionix.Utils;
-using ionix.Utils.Reflection;
-
-namespace ionix.Data
+﻿namespace ionix.Data
 {
+    using Utils;
+    using Utils.Reflection;
     using System;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.IO;
