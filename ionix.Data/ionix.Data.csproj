@@ -55,7 +55,7 @@
     <Compile Include="DbAccess\IDbAccess.cs" />
     <Compile Include="DbAccess\TransactionalDbAccess.cs" />
     <Compile Include="DbValueSetter.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="BulkCopyCommandExtensions.cs" />
     <Compile Include="Fluent\Fluent.cs" />
     <Compile Include="Fluent\FluentBase.cs" />
     <Compile Include="Fluent\FluentDelete.cs" />
