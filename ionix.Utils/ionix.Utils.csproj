@@ -42,6 +42,7 @@
     <Compile Include="IndexedEntityList.cs" />
     <Compile Include="Interfaces.cs" />
     <Compile Include="ionixExtensions.cs" />
+    <Compile Include="Lazy.cs" />
     <Compile Include="LockableList.cs" />
     <Compile Include="Locked.cs" />
     <Compile Include="NonNullable.cs" />
