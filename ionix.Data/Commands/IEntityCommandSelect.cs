@@ -140,7 +140,7 @@
             try
             {
                 dr = this.DataAccess.CreateDataReader(query, CommandBehavior.Default);
-                ret.Capacity = dr.FieldCount;
+                //ret.Capacity = dr.FieldCount; ??? ne bu
                 while (dr.Read())
                 {
                     TEntity entity = new TEntity();
