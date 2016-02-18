@@ -94,7 +94,7 @@
                     metaData = temp;
                 }
 
-                return metaData;
+                return metaData.Copy();//Copy kısmı MultiThread Envirement larda(IIS) gibi static cache lenen ParameterName alanınından kaynaklancak olası hataların(Birden fazla threadn parametre alanını yazması ve okuması gibi) önüne geçmek için eklendi. AppX de deoxyEntityMetaDataProvider(metaData.Copy()); şeklinde idi zaten.
             }
         }
     }
