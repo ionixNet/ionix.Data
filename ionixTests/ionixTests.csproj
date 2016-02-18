@@ -61,6 +61,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Entities.tt</DependentUpon>
     </Compile>
+    <Compile Include="EntityMetaDataProvider.cs" />
     <Compile Include="SqlQuery.cs" />
     <Compile Include="SchemaInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
