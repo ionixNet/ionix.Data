@@ -78,12 +78,15 @@
                 IEntityMetaData metaData;
                 if (!tempCache.TryGetValue(entityType, out metaData))
                 {
+                    int order = 0;
                     EntityMetaData temp = new EntityMetaData(entityType);
                     foreach (PropertyInfo pi in entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                     {
                         SchemaInfo schema = this.FromPropertyInfo(pi);
                         if (null == schema) //NotMapped.
                             continue;
+                        if (schema.Order == 0) //Yani Müdehale Edilmediyse. İleride ParameterName' i çıkarma olasılığı için eklendi.
+                            schema.Order = ++order;
                         schema.Lock();
                         temp.Add(schema, pi);
                     }
