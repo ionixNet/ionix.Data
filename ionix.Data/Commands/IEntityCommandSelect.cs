@@ -11,7 +11,7 @@
     {
         bool ConvertType { get; set; }
 
-        TEntity SelectById<TEntity>(IEntityMetaDataProvider provider, params object[] idValues)
+        TEntity SelectById<TEntity>(IEntityMetaDataProvider provider, params object[] keys)
             where TEntity : new();
 
         TEntity SelectSingle<TEntity>(IEntityMetaDataProvider provider, SqlQuery extendedQuery)
@@ -156,11 +156,11 @@
             return ret;
         }
 
-        public virtual TEntity SelectById<TEntity>(IEntityMetaDataProvider provider, params object[] idValues)
+        public virtual TEntity SelectById<TEntity>(IEntityMetaDataProvider provider, params object[] keys)
             where TEntity : new()
         {
-            if (idValues.IsEmptyList())
-                throw new ArgumentNullException(nameof(idValues));
+            if (keys.IsEmptyList())
+                throw new ArgumentNullException(nameof(keys));
 
             IEntityMetaData metaData = provider.EnsureCreateEntityMetaData<TEntity>();
 
@@ -170,13 +170,13 @@
             FilterCriteriaList filters = new FilterCriteriaList(this.ParameterPrefix);
 
             IList<PropertyMetaData> keySchemas = metaData.OfKeys(true);//Order a göre geldiği için böyle.
-            if (keySchemas.Count != idValues.Length)
+            if (keySchemas.Count != keys.Length)
                 throw new InvalidOperationException("Keys and Valus count does not match");
 
             int index = -1;
             foreach (PropertyMetaData keyProperty in keySchemas)
             {
-                filters.Add(keyProperty, ConditionOperator.Equals, idValues[++index]);
+                filters.Add(keyProperty, ConditionOperator.Equals, keys[++index]);
             }
 
             query.Combine(filters.ToQuery());//Where ifadesi oluşturuldu. Eğer ki
