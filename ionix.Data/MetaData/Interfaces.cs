@@ -8,7 +8,7 @@
     public interface IEntityMetaData : IPrototype<IEntityMetaData>
     {
         IEnumerable<PropertyMetaData> Properties { get; }
-        string TableName { get; set; }
+        string TableName { get; }
         Type EntityType { get; }
 
         PropertyMetaData this[string columnName] { get; }

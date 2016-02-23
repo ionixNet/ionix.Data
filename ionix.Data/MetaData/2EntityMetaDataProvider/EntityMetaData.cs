@@ -68,7 +68,6 @@
     public class EntityMetaData : IEntityMetaData
     {
         private readonly ThrowingHashSet<PropertyMetaData> hash;
-        private string tableName;
 
         public EntityMetaData(Type entityType, string tableName)
         {
@@ -79,7 +78,7 @@
 
             this.hash = new ThrowingHashSet<PropertyMetaData>();
             this.EntityType = entityType;
-            this.tableName = tableName;
+            this.TableName = tableName;
         }
         public EntityMetaData(Type entityType)
             : this(entityType, AttributeExtension.GetTableName(entityType))
@@ -99,16 +98,8 @@
             this.hash.Add(item);
         }
 
-        public string TableName
-        {
-            get
-            {
-                if (null == this.tableName)
-                    return String.Empty;
-                return this.tableName;
-            }
-            set { this.tableName = value; }
-        }
+        public string TableName { get; }
+
         public Type EntityType { get; }
 
         public IEnumerable<PropertyMetaData> Properties => this.hash;
@@ -117,7 +108,7 @@
 
         public IEntityMetaData Copy()
         {
-            EntityMetaData copy = new EntityMetaData(this.EntityType, this.tableName);//Type ReadOnly bir object dir. String de fixed char* kullanılmıyorsa immutable bir nesnedir.
+            EntityMetaData copy = new EntityMetaData(this.EntityType, this.TableName);//Type ReadOnly bir object dir. String de fixed char* kullanılmıyorsa immutable bir nesnedir.
             foreach (PropertyMetaData orginal in this.hash)
             {
                 copy.hash.Add(orginal.Copy());
@@ -140,7 +131,7 @@
                 {
                     this.dic = new Dictionary<string, PropertyMetaData>(this.hash.Count);
                     foreach (PropertyMetaData item in this.hash)
-                        dic.Add(item.Schema.ColumnName, item);
+                        this.dic.Add(item.Schema.ColumnName, item);
                 }
 
                 return this.dic;
