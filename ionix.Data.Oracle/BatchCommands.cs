@@ -40,8 +40,7 @@
                     {
                         batchQuery.Text.AppendLine();
 
-                        updateBuilder.ParameterIndex = index++;
-                        batchQuery.Combine(updateBuilder.CreateQuery(entity, metaData));
+                        batchQuery.Combine(updateBuilder.CreateQuery(entity, metaData, index++));
                     }
 
                     batchQuery.Text.AppendLine();
@@ -106,11 +105,15 @@
                     {
                         batchQuery.Text.AppendLine();
 
-                        insertBuilder.ParameterIndex = index++;
+                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, index, out sequenceIdentity));
 
-                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, out sequenceIdentity));
                         if (null != sequenceIdentity)
-                            outParameterNames.Add(sequenceIdentity.ParameterName);
+                        {
+                            string parameterName = metaData.GetParameterName(sequenceIdentity, index);
+                            outParameterNames.Add(parameterName);
+                        }
+
+                        ++index;
                     }
 
                     batchQuery.Text.AppendLine();
@@ -190,11 +193,14 @@
                     {
                         batchQuery.Text.AppendLine();
 
-                        upsertBuilder.ParameterIndex = index++;
-
-                        batchQuery.Combine(upsertBuilder.CreateQuery(entity, metaData, out sequenceIdentity));
+                        batchQuery.Combine(upsertBuilder.CreateQuery(entity, metaData, index, out sequenceIdentity));
                         if (null != sequenceIdentity)
-                            outParameterNames.Add(sequenceIdentity.ParameterName);
+                        {
+                            string parameterName = metaData.GetParameterName(sequenceIdentity, index);
+                            outParameterNames.Add(parameterName);
+                        }
+
+                        ++index;
                     }
 
                     batchQuery.Text.AppendLine();
@@ -281,11 +287,14 @@
                     {
                         batchQuery.Text.AppendLine();
 
-                        insertBuilder.ParameterIndex = index++;
-
-                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, out sequenceIdentity));
+                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, index, out sequenceIdentity));
                         if (null != sequenceIdentity)
-                            outParameterNames.Add(sequenceIdentity.ParameterName);
+                        {
+                            string parameterName = metaData.GetParameterName(sequenceIdentity, index);
+                            outParameterNames.Add(parameterName);
+                        }
+
+                        ++index;
                     }
 
                     batchQuery.Text.AppendLine();

@@ -23,19 +23,6 @@
 
         public PropertyInfo Property { get; }
 
-        private string parameterName;
-        public string ParameterName//Batch Command larda index ler paramatre isimlerine ekleniyor diye
-        {
-            get
-            {
-                if (null == this.parameterName)
-                    return this.Schema.ColumnName;
-
-                return this.parameterName;
-            }
-            set { this.parameterName = value; }
-        }
-
         //Cache lenen nesnelerde schema info ve parametre isminin değişmesi sıkıntı çıkartıyor(ki command nesneleri bu edğişkikliği yapıyor.)
         public PropertyMetaData Copy()
         {
@@ -105,6 +92,12 @@
         public IEnumerable<PropertyMetaData> Properties => this.hash;
 
         public int Count => this.hash.Count;
+
+        public string GetParameterName(PropertyMetaData pm, int index)
+        {
+            int factor = this.hash.Count * index;
+            return (factor + pm.Schema.Order - 1).ToString();
+        }
 
         public IEntityMetaData Copy()
         {

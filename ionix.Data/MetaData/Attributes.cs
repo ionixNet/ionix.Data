@@ -16,8 +16,6 @@
 
         public bool ReadOnly { get; set; }
 
-        public int Order { get; set; }
-
         public SqlValueType SqlValueType { get; set; }
     }
 }

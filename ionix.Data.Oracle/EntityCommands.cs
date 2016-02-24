@@ -26,7 +26,7 @@
         internal int UpdateInternal(object entity, IEntityMetaData metaData)
         {
             EntitySqlQueryBuilderUpdate builder = new EntitySqlQueryBuilderUpdate() { UpdatedFields = this.UpdatedFields };
-            SqlQuery query = builder.CreateQuery(entity, metaData);
+            SqlQuery query = builder.CreateQuery(entity, metaData, 0);
 
             return base.DataAccess.ExecuteNonQuery(query);
         }
@@ -56,12 +56,13 @@
         {
             EntitySqlQueryBuilderInsert builder = new EntitySqlQueryBuilderInsert(base.DataAccess, false) { InsertFields = this.InsertFields };
             PropertyMetaData sequenceIdentity;
-            SqlQuery query = builder.CreateQuery(entity, metaData, out sequenceIdentity);
+            SqlQuery query = builder.CreateQuery(entity, metaData, 0, out sequenceIdentity);
 
             int ret = base.DataAccess.ExecuteNonQuery(query);
             if (null != sequenceIdentity)
             {
-                object identityValue = query.Parameters.Find(sequenceIdentity.ParameterName).Value;
+                string parameterName = metaData.GetParameterName(sequenceIdentity, 0);
+                object identityValue = query.Parameters.Find(parameterName).Value;
                 sequenceIdentity.Property.SetValue(entity, identityValue, null);
             }
             return ret;
@@ -93,12 +94,13 @@
         {
             EntitySqlQueryBuilderUpsert builder = new EntitySqlQueryBuilderUpsert(this.DataAccess, false) { UpdatedFields = this.UpdatedFields, InsertFields = this.InsertFields };
             PropertyMetaData sequenceIdentity;
-            SqlQuery query = builder.CreateQuery(entity, metaData, out sequenceIdentity);
+            SqlQuery query = builder.CreateQuery(entity, metaData, 0, out sequenceIdentity);
 
             int ret = base.DataAccess.ExecuteNonQuery(query);
             if (null != sequenceIdentity)
             {
-                object identityValue = query.Parameters.Find(sequenceIdentity.ParameterName).Value;
+                string parameterName = metaData.GetParameterName(sequenceIdentity, 0);
+                object identityValue = query.Parameters.Find(parameterName).Value;
                 sequenceIdentity.Property.SetValue(entity, identityValue, null);
             }
             return ret;
@@ -132,7 +134,7 @@
             text.Append("DELETE FROM ");
             text.Append(metaData.TableName);
 
-            query.Combine(SqlQueryHelper.CreateWhereSqlByKeys(metaData, ':', entity));
+            query.Combine(SqlQueryHelper.CreateWhereSqlByKeys(metaData, 0, GlobalInternal.Prefix, entity));
 
             return base.DataAccess.ExecuteNonQuery(query);
         }

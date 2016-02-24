@@ -115,8 +115,8 @@
 			s += ", MaxLength = " + c.MaxLength;
 		if (!String.IsNullOrEmpty(c.Default))
 			s += ", DefaultValue = \"" + c.Default + "\"";
-		if (c.Ordinal > -1)
-			s += ", Order = " + c.Ordinal;
+		//if (c.Ordinal > -1)
+		//	s += ", Order = " + c.Ordinal;
 
 		s += ")]";
 

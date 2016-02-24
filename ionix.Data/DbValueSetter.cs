@@ -16,11 +16,11 @@
 
         public abstract char Prefix { get; }
 
-        public virtual void SetColumnValue(SqlQuery query, PropertyMetaData metaData, object entity)//Parametewnin eklenip eklenmeyeceği bilinmdeğinden prefix ve entity verilmek zorunda.
+        public virtual void SetColumnValue(IEntityMetaData metaData, int index, SqlQuery query, PropertyMetaData pm, object entity)//Parametewnin eklenip eklenmeyeceği bilinmdeğinden prefix ve entity verilmek zorunda.
         {
-            SchemaInfo schema = metaData.Schema;
-            PropertyInfo pi = metaData.Property;
-            object parValue = metaData.Property.GetValue(entity, null);
+            SchemaInfo schema = pm.Schema;
+            PropertyInfo pi = pm.Property;
+            object parValue = pm.Property.GetValue(entity, null);
 
             StringBuilder text = query.Text;
             if (schema.DefaultValue.Length != 0)
@@ -37,9 +37,11 @@
             {
                 case SqlValueType.Parameterized:
                     text.Append(this.Prefix);
-                    text.Append(metaData.ParameterName);
 
-                    SqlQueryParameter par = SqlQueryParameter.Create(metaData, parValue);
+                    string parameterName = metaData.GetParameterName(pm, index);
+                    text.Append(parameterName);
+
+                    SqlQueryParameter par = SqlQueryParameter.Create(parameterName, pm, parValue);
 
                     query.Parameters.Add(par);
                     break;
@@ -47,7 +49,7 @@
                     string textValue = null;
                     if (null != parValue)
                     {
-                        Type dataType = metaData.Schema.DataType;//Neden Schema.DataType çünkü pi.PropertyType nullable olabalir.
+                        Type dataType = pm.Schema.DataType;//Neden Schema.DataType çünkü pi.PropertyType nullable olabalir.
                         if (WithQuotes.Contains(dataType))
                         {
                             textValue = "'" + parValue + "'";

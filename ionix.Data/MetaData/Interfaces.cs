@@ -12,6 +12,8 @@
         Type EntityType { get; }
 
         PropertyMetaData this[string columnName] { get; }
+
+        string GetParameterName(PropertyMetaData pm, int index);
     }
     public interface IEntityMetaDataProvider
     {

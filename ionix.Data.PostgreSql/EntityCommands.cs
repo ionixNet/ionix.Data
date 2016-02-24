@@ -28,7 +28,7 @@
         internal int UpdateInternal(object entity, IEntityMetaData metaData)
         {
             EntitySqlQueryBuilderUpdate builder = new EntitySqlQueryBuilderUpdate() { UpdatedFields = this.UpdatedFields };
-            SqlQuery query = builder.CreateQuery(entity, metaData);
+            SqlQuery query = builder.CreateQuery(entity, metaData, 0);
 
             return base.DataAccess.ExecuteNonQuery(query);
         }
@@ -57,7 +57,7 @@
         {
             EntitySqlQueryBuilderInsert builder = new EntitySqlQueryBuilderInsert() { InsertFields = this.InsertFields };
             PropertyMetaData identity;
-            SqlQuery query = builder.CreateQuery(entity, metaData, out identity);
+            SqlQuery query = builder.CreateQuery(entity, metaData, 0, out identity);
 
             if (null != identity)
             {
@@ -134,7 +134,7 @@
             text.Append("DELETE FROM ");
             text.Append(metaData.TableName);
 
-            query.Combine(SqlQueryHelper.CreateWhereSqlByKeys(metaData, ':', entity));
+            query.Combine(SqlQueryHelper.CreateWhereSqlByKeys(metaData, 0, GlobalInternal.Prefix, entity));
 
             return base.DataAccess.ExecuteNonQuery(query);
         }

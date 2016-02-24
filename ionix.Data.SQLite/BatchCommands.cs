@@ -40,8 +40,7 @@
                     {
                         batchQuery.Text.AppendLine();
 
-                        updateBuilder.ParameterIndex = index++;
-                        batchQuery.Combine(updateBuilder.CreateQuery(entity, metaData));
+                        batchQuery.Combine(updateBuilder.CreateQuery(entity, metaData, index++));
                     }
 
                     batchQuery.Text.AppendLine();
@@ -105,9 +104,7 @@
                     {
                         batchQuery.Text.AppendLine();
 
-                        insertBuilder.ParameterIndex = index++;
-
-                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, out sequenceIdentity));
+                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, index++, out sequenceIdentity));
                     }
 
                     batchQuery.Text.AppendLine();
@@ -222,9 +219,7 @@
                     {
                         batchQuery.Text.AppendLine();
 
-                        insertBuilder.ParameterIndex = index++;
-
-                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, out sequenceIdentity));
+                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, index++, out sequenceIdentity));
                     }
 
                     batchQuery.Text.AppendLine();

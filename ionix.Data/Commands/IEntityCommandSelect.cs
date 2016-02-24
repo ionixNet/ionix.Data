@@ -176,7 +176,8 @@
             int index = -1;
             foreach (PropertyMetaData keyProperty in keySchemas)
             {
-                filters.Add(keyProperty, ConditionOperator.Equals, keys[++index]);
+                string parameterName = metaData.GetParameterName(keyProperty, 0);
+                filters.Add(keyProperty.Schema.ColumnName, parameterName, ConditionOperator.Equals, keys[++index]);
             }
 
             query.Combine(filters.ToQuery());//Where ifadesi oluşturuldu. Eğer ki

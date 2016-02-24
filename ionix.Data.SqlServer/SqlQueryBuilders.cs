@@ -7,22 +7,12 @@
 
     public class EntitySqlQueryBuilderUpdate : IEntitySqlQueryBuilder
     {
-        public EntitySqlQueryBuilderUpdate()
-        {
-            this.ParameterIndex = -1;
-        }
-        //Batch ler için Eklendi.
-        public int ParameterIndex { get; set; }
-
-        //EntityChangeSet  Kullanımı İçin Eklendi.
         public HashSet<string> UpdatedFields { get; set; }
 
-        public virtual SqlQuery CreateQuery(object entity, IEntityMetaData metaData)
+        public virtual SqlQuery CreateQuery(object entity, IEntityMetaData metaData, int index)
         {
             if (null == entity)
                 throw new ArgumentNullException(nameof(entity));
-
-            SqlQueryHelper.IndexParameterNames(metaData, this.ParameterIndex);
 
             bool updatedFieldsEnabled = !this.UpdatedFields.IsEmptyList();
 
@@ -51,13 +41,13 @@
                 text.Append(schema.ColumnName);
                 text.Append('=');
 
-                SqlQueryHelper.SetColumnValue(ValueSetter.Instance, query, property, entity);
+                SqlQueryHelper.SetColumnValue(ValueSetter.Instance, metaData, index, query, property, entity);
 
                 text.Append(',');
             }
             text.Remove(text.Length - 1, 1);
 
-            query.Combine(SqlQueryHelper.CreateWhereSqlByKeys(metaData, '@', entity));
+            query.Combine(SqlQueryHelper.CreateWhereSqlByKeys(metaData, index, GlobalInternal.Prefix, entity));
 
             return query;
         }
@@ -65,22 +55,14 @@
 
     public class EntitySqlQueryBuilderInsert : IEntitySqlQueryBuilder
     {
-        public EntitySqlQueryBuilderInsert()
-        {
-            this.ParameterIndex = -1;
-        }
-        public int ParameterIndex { get; set; }
-
         public HashSet<string> InsertFields { get; set; }
 
-        public virtual SqlQuery CreateQuery(object entity, IEntityMetaData metaData, out PropertyMetaData identity)
+        public virtual SqlQuery CreateQuery(object entity, IEntityMetaData metaData, int index, out PropertyMetaData identity)
         {
             if (null == entity)
                 throw new ArgumentNullException(nameof(entity));
 
             identity = null;
-
-            SqlQueryHelper.IndexParameterNames(metaData, this.ParameterIndex);
 
             bool insertFieldsEnabled = !this.InsertFields.IsEmptyList();
 
@@ -124,7 +106,7 @@
 
             foreach (PropertyMetaData property in validInfos)
             {
-                SqlQueryHelper.SetColumnValue(ValueSetter.Instance, query, property, entity);
+                SqlQueryHelper.SetColumnValue(ValueSetter.Instance, metaData, index, query, property, entity);
 
                 text.Append(',');
             }
@@ -135,42 +117,38 @@
                 text.AppendLine();
 
                 text.Append("SELECT @");
-                text.Append(identity.ParameterName);
+
+                string parameterName = metaData.GetParameterName(identity, index);
+                text.Append(parameterName);
+
                 text.Append("=SCOPE_IDENTITY()");
 
-                SqlQueryParameter identityParameter = SqlQueryHelper.EnsureHasParameter(query, identity, entity);
+                SqlQueryParameter identityParameter = SqlQueryHelper.EnsureHasParameter(query, parameterName, identity, entity);
                 identityParameter.Direction = System.Data.ParameterDirection.InputOutput;
             }
 
             return query;
         }
 
-        SqlQuery IEntitySqlQueryBuilder.CreateQuery(object entity, IEntityMetaData metaData)
+        SqlQuery IEntitySqlQueryBuilder.CreateQuery(object entity, IEntityMetaData metaData, int index)
         {
             PropertyMetaData identity;
-            return this.CreateQuery(entity, metaData, out identity);
+            return this.CreateQuery(entity, metaData, index, out identity);
         }
     }
 
     public class EntitySqlQueryBuilderUpsert : IEntitySqlQueryBuilder
     {
-        public EntitySqlQueryBuilderUpsert()
-        {
-            this.ParameterIndex = -1;
-        }
-        public int ParameterIndex { get; set; }
-
         public HashSet<string> UpdatedFields { get; set; }
 
         public HashSet<string> InsertFields { get; set; }
 
-        public virtual SqlQuery CreateQuery(object entity, IEntityMetaData metaData, out PropertyMetaData identity)
+        public virtual SqlQuery CreateQuery(object entity, IEntityMetaData metaData, int index, out PropertyMetaData identity)
         {
             EntitySqlQueryBuilderUpdate builderUpdate = new EntitySqlQueryBuilderUpdate();
-            builderUpdate.ParameterIndex = this.ParameterIndex;
             builderUpdate.UpdatedFields = this.UpdatedFields;
 
-            SqlQuery query = builderUpdate.CreateQuery(entity, metaData);
+            SqlQuery query = builderUpdate.CreateQuery(entity, metaData, index);
             StringBuilder text = query.Text;
 
             text.AppendLine();
@@ -180,9 +158,8 @@
             text.AppendLine();
 
             EntitySqlQueryBuilderInsert builderInsert = new EntitySqlQueryBuilderInsert();
-            builderInsert.ParameterIndex = this.ParameterIndex;
             builderInsert.InsertFields = this.InsertFields;
-            query.Combine(builderInsert.CreateQuery(entity, metaData, out identity));
+            query.Combine(builderInsert.CreateQuery(entity, metaData, index, out identity));
 
             text.AppendLine();
             text.Append("END");
@@ -190,10 +167,10 @@
             return query;
         }
 
-        SqlQuery IEntitySqlQueryBuilder.CreateQuery(object entity, IEntityMetaData metaData)
+        SqlQuery IEntitySqlQueryBuilder.CreateQuery(object entity, IEntityMetaData metaData, int index)
         {
             PropertyMetaData identity;
-            return this.CreateQuery(entity, metaData, out identity);
+            return this.CreateQuery(entity, metaData, index, out identity);
         }
     }
 }

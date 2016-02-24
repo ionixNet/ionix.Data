@@ -56,7 +56,7 @@
             }
         }
 
-        public static SqlQuery CreateWhereSqlByKeys(IEntityMetaData metaData, char prefix, object entity)
+        public static SqlQuery CreateWhereSqlByKeys(IEntityMetaData metaData, int index, char prefix, object entity)
         {
             if (null == entity)
                 throw new ArgumentNullException(nameof(entity));
@@ -73,57 +73,29 @@
             for (int j = 0; j < keySchemas.Count; ++j)
             {
                 PropertyMetaData keySchema = keySchemas[j];
-
-                list.Add(keySchema, ConditionOperator.Equals, keyValues[j]);
+                string parameterName = metaData.GetParameterName(keySchema, index);
+                list.Add(keySchema.Schema.ColumnName, parameterName, ConditionOperator.Equals, keyValues[j]);
             }
             return list.ToQuery();
         }
 
         //Upsert de Identity Parametre İçin Eklendi.
-        public static SqlQueryParameter EnsureHasParameter(SqlQuery query, PropertyMetaData property, object entity)//inset de bu parametre normalde eklenmez ama upsert de update where de eklendiği için bu yapı kullanılıyor.
+        public static SqlQueryParameter EnsureHasParameter(SqlQuery query, string parameterName, PropertyMetaData property, object entity)//inset de bu parametre normalde eklenmez ama upsert de update where de eklendiği için bu yapı kullanılıyor.
         {
-
-            SqlQueryParameter identityParameter = query.Parameters.Find(property.ParameterName);
+            SqlQueryParameter identityParameter = query.Parameters.Find(parameterName);
             if (null == identityParameter)
             {
                 object parValue = property.Property.GetValue(entity, null);
-                identityParameter = SqlQueryParameter.Create(property, parValue);
+                identityParameter = SqlQueryParameter.Create(parameterName, property, parValue);
 
                 query.Parameters.Add(identityParameter);
             }
             return identityParameter;
         }
 
-        public static void IndexParameterNames(IEntityMetaData metaData, int parameterIndex)//ParameterIndex Batch ler için.
+        public static void SetColumnValue(DbValueSetter setter, IEntityMetaData metaData, int index, SqlQuery query, PropertyMetaData pm, object entity)//Parametewnin eklenip eklenmeyeceği bilinmdeğinden prefix ve entity verilmek zorunda.
         {
-            if (parameterIndex > -1)
-            {
-                IEnumerable<PropertyMetaData> properties = metaData.Properties;
-                int fieldCount = ((ICollection<PropertyMetaData>)properties).Count;
-                int factor = fieldCount * parameterIndex;
-
-                foreach (PropertyMetaData prop in properties)
-                {
-                    prop.ParameterName = (factor++).ToString();
-                }
-            }
-            else
-            {
-                int indexName = -1;
-                foreach (PropertyMetaData prop in metaData.Properties)
-                {
-                    prop.ParameterName = (++indexName).ToString();
-                }
-            }
-        }
-        //public static void SetParameterName(PropertyMetaData property, int parameterIndex)
-        //{
-        //    property.ParameterName = property.Schema.ColumnName + parameterIndex;
-        //}
-
-        public static void SetColumnValue(DbValueSetter setter, SqlQuery query, PropertyMetaData metaData, object entity)//Parametewnin eklenip eklenmeyeceği bilinmdeğinden prefix ve entity verilmek zorunda.
-        {
-            setter.SetColumnValue(query, metaData, entity);
+            setter.SetColumnValue(metaData, index, query, pm, entity);
         }
 
         public static PropertyMetaData GetPrimaryKey(this IEntityMetaData metaData)//not unique keys.

@@ -40,8 +40,7 @@
                     {
                         batchQuery.Text.AppendLine();
 
-                        updateBuilder.ParameterIndex = index++;
-                        batchQuery.Combine(updateBuilder.CreateQuery(entity, metaData));
+                        batchQuery.Combine(updateBuilder.CreateQuery(entity, metaData, index++));
                     }
 
                     batchQuery.Text.AppendLine();
@@ -55,13 +54,10 @@
                     int ret = 0;
                     EntityCommandUpdate updateCommand = new EntityCommandUpdate(base.DataAccess);
                     updateCommand.UpdatedFields = this.UpdatedFields;
-                    //using (TransactionScope tran = new TransactionScope())
-                    // {
                     foreach (TEntity entity in entityList)
                     {
                         ret += updateCommand.UpdateInternal(entity, metaData);
                     }
-                    // }
                     return ret;
                 default:
                     throw new NotSupportedException(mode.ToString());
@@ -108,11 +104,14 @@
                     {
                         batchQuery.Text.AppendLine();
 
-                        insertBuilder.ParameterIndex = index++;
-
-                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, out identity));
+                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, index, out identity));
                         if (null != identity)
-                            outParameterNames.Add(identity.ParameterName);
+                        {
+                            string parameterName = metaData.GetParameterName(identity, index);
+                            outParameterNames.Add(parameterName);
+                        }
+
+                        ++index;
                     }
 
                     batchQuery.Text.AppendLine();
@@ -192,11 +191,14 @@
                     {
                         batchQuery.Text.AppendLine();
 
-                        upsertBuilder.ParameterIndex = index++;
-
-                        batchQuery.Combine(upsertBuilder.CreateQuery(entity, metaData, out identity));
+                        batchQuery.Combine(upsertBuilder.CreateQuery(entity, metaData, index, out identity));
                         if (null != identity)
-                            outParameterNames.Add(identity.ParameterName);
+                        {
+                            string parameterName = metaData.GetParameterName(identity, index);
+                            outParameterNames.Add(parameterName);
+                        }
+
+                        ++index;
                     }
 
                     batchQuery.Text.AppendLine();
@@ -223,13 +225,10 @@
                     EntityCommandUpsert upsertCommand = new EntityCommandUpsert(base.DataAccess);
                     upsertCommand.UpdatedFields = this.UpdatedFields;
                     upsertCommand.InsertFields = this.InsertFields;
-                    //using (TransactionScope tran = new TransactionScope())
-                    //{
                     foreach (TEntity entity in entityList)
                     {
                         sum += upsertCommand.UpsertInternal(entity, metaData);
                     }
-                    // }
                     return sum;
 
                 default:
@@ -285,11 +284,14 @@
                     {
                         batchQuery.Text.AppendLine();
 
-                        insertBuilder.ParameterIndex = index++;
-
-                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, out identity));
+                        batchQuery.Combine(insertBuilder.CreateQuery(entity, metaData, index, out identity));
                         if (null != identity)
-                            outParameterNames.Add(identity.ParameterName);
+                        {
+                            string parameterName = metaData.GetParameterName(identity, index);
+                            outParameterNames.Add(parameterName);
+                        }
+
+                        ++index;
                     }
 
                     batchQuery.Text.AppendLine();

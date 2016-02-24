@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ionix.Data;
+using ionix.Utils.Extensions;
 using ionixTests.Models;
 using ionixTests.SqlServer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,6 +12,19 @@ namespace ionixTests
     [TestClass]
     public class EntityCommandSelect
     {
+        [TestMethod]
+        public void SelectByIdTest()
+        {
+            Customers customer = null;
+            using (var client = DataFactory.CretDbClient())
+            {
+                customer = client.Cmd.SelectById<Customers>("ALFKI");
+                customer = (Customers)client.Cmd.SelectById(typeof(Customers), "ALFKI");
+            }
+
+            Assert.IsNotNull(customer);
+        }
+
         [TestMethod]
         public void QueryTest()
         {
@@ -132,7 +146,7 @@ namespace ionixTests
             {
                 var catagories = client.Cmd.Select<Categories>();
 
-                client.Cmd.BatchUpdate(catagories);
+                client.Cmd.BatchUpdate(catagories, BatchCommandMode.Batch);
             }
         }
 
@@ -150,7 +164,25 @@ namespace ionixTests
 
             using (var client = DataFactory.CretDbClient())
             {
-                client.Cmd.BatchInsert(territories);
+                client.Cmd.BatchInsert(territories, BatchCommandMode.Batch);
+            }
+        }
+
+
+        [TestMethod]
+        public void BatchInsertTest2()
+        {
+            var categories = new List<Categories>();
+            for (int j = 0; j < 3; ++j)
+                categories.Add(new Categories()
+                {
+                  //  CategoryName = Guid.NewGuid().ToString().Substring(0, 12),
+                    Description = "İşte Bu Parametresiz"
+                });
+
+            using (var client = DataFactory.CretDbClient())
+            {
+                client.Cmd.BatchInsert(categories);
             }
         }
 
@@ -168,9 +200,11 @@ namespace ionixTests
 
             using (var client = DataFactory.CretDbClient())
             {
-                var territories = client.Cmd.Select<Territories>();
+                var categories = client.Cmd.Query<Categories>("select top 3 * from [NORTHWND].[dbo].[Categories]".ToQuery());
+               
+                categories.ForEach((item) => item.CategoryID = -1);
 
-                client.Cmd.BatchUpsert(territories, BatchCommandMode.Single);
+                client.Cmd.BatchUpsert(categories, BatchCommandMode.Batch);
             }
         }
 

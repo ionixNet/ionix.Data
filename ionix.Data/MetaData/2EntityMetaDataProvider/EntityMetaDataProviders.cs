@@ -82,11 +82,12 @@
                     EntityMetaData temp = new EntityMetaData(entityType);
                     foreach (PropertyInfo pi in entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                     {
+                        ++order;
                         SchemaInfo schema = this.FromPropertyInfo(pi);
                         if (null == schema) //NotMapped.
                             continue;
-                        if (schema.Order == 0) //Yani Müdehale Edilmediyse. İleride ParameterName' i çıkarma olasılığı için eklendi.
-                            schema.Order = ++order;
+
+                        schema.Order = order; //Order parametere isimlarine ardışıklık için çok önemli. Oyüzden base de atamasını yaptık.
                         schema.Lock();
                         temp.Add(schema, pi);
                     }
@@ -97,7 +98,7 @@
                     metaData = temp;
                 }
 
-                return metaData.Copy();//Copy kısmı MultiThread Envirement larda(IIS) gibi static cache lenen ParameterName alanınından kaynaklancak olası hataların(Birden fazla threadn parametre alanını yazması ve okuması gibi) önüne geçmek için eklendi. AppX de deoxyEntityMetaDataProvider(metaData.Copy()); şeklinde idi zaten.
+                return metaData;
             }
         }
     }
@@ -124,7 +125,6 @@
                 schema.DefaultValue = att.DefaultValue;
                 schema.IsKey = att.IsKey;
                 schema.MaxLength = att.MaxLength;
-                schema.Order = att.Order;
                 schema.IsNullable = att.IsNullable;
                 schema.ReadOnly = att.ReadOnly;
                 schema.SqlValueType = att.SqlValueType;

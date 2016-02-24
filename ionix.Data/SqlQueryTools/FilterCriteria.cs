@@ -177,13 +177,6 @@
         {
             this.Add(columnName, null, op, values);
         }
-        public void Add(PropertyMetaData property, ConditionOperator op, params object[] values)
-        {
-            if (null == property)
-                throw new ArgumentNullException("info");
-
-            this.Add(property.Schema.ColumnName, property.ParameterName, op, values);
-        }
 
         public SqlQuery ToQuery(string tableNameOp)
         {

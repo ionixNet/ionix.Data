@@ -22,7 +22,7 @@ namespace ionixTests
             int len = metaData.Properties.Count();
 
             Stopwatch bench = Stopwatch.StartNew();
-            for (int j = 0; j < 1000000; ++j)
+            for (int j = 0; j < 1; ++j)
                 metaData.Copy();
             bench.Stop();
 

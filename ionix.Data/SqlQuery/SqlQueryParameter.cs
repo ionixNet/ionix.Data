@@ -8,13 +8,13 @@
 
     public sealed partial class SqlQueryParameter : IEquatable<SqlQueryParameter>
     {
-        internal static SqlQueryParameter Create(PropertyMetaData metaData, object value)
+        internal static SqlQueryParameter Create(string parameterName, PropertyMetaData pm, object value)
         {
             SqlQueryParameter ret = new SqlQueryParameter();
-            ret.ParameterName = metaData.ParameterName;
+            ret.ParameterName = parameterName;
             ret.Value = value;
 
-            SchemaInfo schema = metaData.Schema;
+            SchemaInfo schema = pm.Schema;
             ret.isNullable = schema.IsNullable;
             ret.dbType = TypeMap[schema.DataType];
 
