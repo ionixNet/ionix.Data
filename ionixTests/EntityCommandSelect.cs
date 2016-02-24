@@ -176,7 +176,7 @@ namespace ionixTests
             for (int j = 0; j < 3; ++j)
                 categories.Add(new Categories()
                 {
-                  //  CategoryName = Guid.NewGuid().ToString().Substring(0, 12),
+                    CategoryName = Guid.NewGuid().ToString().Substring(0, 12),
                     Description = "İşte Bu Parametresiz"
                 });
 

@@ -73,10 +73,10 @@ namespace ionixTests.Models
         [DbSchema(IsNullable = false, IsKey=true, DatabaseGeneratedOption = ionix.Data.StoreGeneratedPattern.Identity)]
 		public int CategoryID { get; set; }
 
-        [DbSchema(IsNullable = false, MaxLength = 15, DefaultValue = "'CategoryName mi?'")]
+        [DbSchema(IsNullable = false, MaxLength = 15)]
 		public string CategoryName { get; set; }
 
-        [DbSchema(IsNullable = true, MaxLength = 1073741823, SqlValueType = SqlValueType.Text)]
+        [DbSchema(IsNullable = true, MaxLength = 1073741823)]
 		public string Description { get; set; }
 
         [DbSchema(IsNullable = true, MaxLength = 2147483647)]
