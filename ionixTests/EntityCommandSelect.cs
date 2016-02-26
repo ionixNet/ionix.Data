@@ -50,7 +50,7 @@ namespace ionixTests
             using (var client = DataFactory.CretDbClient())
             {
                 customer = client.Cmd.QuerySingle<Customers>("select * from Customers where CustomerID=@0".ToQuery("ANATR"));
-                customer = (Customers)client.Cmd.QuerySingle(typeof(Customers), "select * from Customers where CustomerID=@0".ToQuery("ANATR"));
+                customer = (Customers)client.Cmd.QuerySingle(typeof(Customers), "select * from Customers where CustomerID=@0".ToQuery("WOLZA"));
             }
 
             Assert.IsNotNull(customer);

@@ -1,7 +1,6 @@
 ﻿namespace ionix.Data
 {
     using Utils;
-    using Utils.Collections;
     using System;
     using System.Collections.Generic;
     using System.Reflection;
@@ -54,7 +53,7 @@
 
     public class EntityMetaData : IEntityMetaData
     {
-        private readonly ThrowingHashSet<PropertyMetaData> hash;
+        private readonly Dictionary<string, PropertyMetaData> dic;
 
         public EntityMetaData(Type entityType, string tableName)
         {
@@ -63,7 +62,7 @@
             if (String.IsNullOrEmpty(tableName))
                 throw new ArgumentNullException(nameof(tableName));
 
-            this.hash = new ThrowingHashSet<PropertyMetaData>();
+            this.dic = new Dictionary<string, PropertyMetaData>();
             this.EntityType = entityType;
             this.TableName = tableName;
         }
@@ -73,38 +72,31 @@
 
         }
 
-        public void Add(SchemaInfo schema, PropertyInfo property)
+        internal void Add(SchemaInfo schema, PropertyInfo property)
         {
-            this.hash.Add(new PropertyMetaData(schema, property));
-        }
-        public void Add(PropertyMetaData item)
-        {
-            if (null == item)
-                throw new ArgumentNullException(nameof(item));
-
-            this.hash.Add(item);
+            this.dic.Add(schema.ColumnName, new PropertyMetaData(schema, property));
         }
 
         public string TableName { get; }
 
         public Type EntityType { get; }
 
-        public IEnumerable<PropertyMetaData> Properties => this.hash;
+        public IEnumerable<PropertyMetaData> Properties => this.dic.Values;
 
-        public int Count => this.hash.Count;
+        public int Count => this.dic.Count;
 
         public string GetParameterName(PropertyMetaData pm, int index)
         {
-            int factor = this.hash.Count * index;
+            int factor = this.dic.Count * index;
             return (factor + pm.Schema.Order - 1).ToString();
         }
 
         public IEntityMetaData Copy()
         {
             EntityMetaData copy = new EntityMetaData(this.EntityType, this.TableName);//Type ReadOnly bir object dir. String de fixed char* kullanılmıyorsa immutable bir nesnedir.
-            foreach (PropertyMetaData orginal in this.hash)
+            foreach (KeyValuePair<string,PropertyMetaData> orginal in this.dic)
             {
-                copy.hash.Add(orginal.Copy());
+                copy.dic.Add(orginal.Key, orginal.Value.Copy());
             }
 
             return copy;
@@ -115,28 +107,12 @@
             return this.TableName;
         }
 
-        private Dictionary<string, PropertyMetaData> dic;
-        private Dictionary<string, PropertyMetaData> Dic
-        {
-            get
-            {
-                if (null == this.dic)
-                {
-                    this.dic = new Dictionary<string, PropertyMetaData>(this.hash.Count);
-                    foreach (PropertyMetaData item in this.hash)
-                        this.dic.Add(item.Schema.ColumnName, item);
-                }
-
-                return this.dic;
-            }
-        }
-
         public PropertyMetaData this[string columnName]
         {
             get
             {
                 PropertyMetaData p;
-                this.Dic.TryGetValue(columnName, out p);
+                this.dic.TryGetValue(columnName, out p);
                 return p;
             }
         }

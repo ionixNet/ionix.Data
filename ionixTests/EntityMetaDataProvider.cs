@@ -17,12 +17,14 @@ namespace ionixTests
         {
             IEntityMetaDataProvider provider = new DbSchemaMetaDataProvider();
 
-            var metaData = provider.CreateEntityMetaData(typeof (Invoices));
+            EntityMetaData metaData = (EntityMetaData)provider.CreateEntityMetaData(typeof (Invoices));
+
+            var copy = metaData.Copy();
 
             int len = metaData.Properties.Count();
 
             Stopwatch bench = Stopwatch.StartNew();
-            for (int j = 0; j < 1; ++j)
+            for (int j = 0; j < 1000000; ++j)
                 metaData.Copy();
             bench.Stop();
 
