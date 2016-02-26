@@ -19,7 +19,6 @@ namespace ionixTests
             schema.IsKey = true;
             schema.IsNullable = false;
             schema.MaxLength = 32;
-            schema.Order = 42;
             schema.ReadOnly = false;
             schema.SqlValueType = SqlValueType.Parameterized;;
 

@@ -101,7 +101,7 @@
         public int Order
         {
             get { return this.order.Value; }
-            set { this.order.Value = value; }
+            internal set { this.order.Value = value; }
         }
 
 
