@@ -22,12 +22,12 @@
             {
                 SchemaInfo schema = primaryKey.Schema;
                 StoreGeneratedPattern pattern = schema.DatabaseGeneratedOption;
-                if (pattern != StoreGeneratedPattern.Sequence && pattern != StoreGeneratedPattern.SequenceAutoGenerate)
+                if (pattern != StoreGeneratedPattern.AutoGenerateSequence)
                 {
                     bool isLocked = schema.IsLocked;
                     if (isLocked)
                         schema.Unlock();
-                    schema.DatabaseGeneratedOption = StoreGeneratedPattern.SequenceAutoGenerate;
+                    schema.DatabaseGeneratedOption = StoreGeneratedPattern.AutoGenerateSequence;
                     if (isLocked)
                         schema.Lock();
                 }

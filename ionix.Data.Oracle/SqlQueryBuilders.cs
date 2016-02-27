@@ -104,11 +104,11 @@
                     case StoreGeneratedPattern.Computed:
                         continue;// not in insert list.
 
-                    case StoreGeneratedPattern.Sequence:
-                        if (schema.DefaultValue.Length == 0)
-                            throw new NullReferenceException("if SchemaInfo.DatabaseGeneratedOption = Sequence then Schema.DefaultValue can not be null or empty");
-                        break;
-                    case StoreGeneratedPattern.SequenceAutoGenerate:
+                    //case StoreGeneratedPattern.Sequence:
+                    //    if (schema.DefaultValue.Length == 0)
+                    //        throw new NullReferenceException("if SchemaInfo.DatabaseGeneratedOption = Sequence then Schema.DefaultValue can not be null or empty");
+                    //    break;
+                    case StoreGeneratedPattern.AutoGenerateSequence:
                         if (null != sequenceIdentity)
                             throw new MultipleIdentityColumnFoundException(entity);
 
