@@ -54,7 +54,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="EntityCommandSelect.cs" />
+    <Compile Include="EntityCommandTests.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Models\Entities1.cs">
       <AutoGen>True</AutoGen>

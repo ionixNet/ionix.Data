@@ -46,6 +46,7 @@
     <Compile Include="Commands\ICommandFactory.cs" />
     <Compile Include="Commands\IEntityCommands.cs" />
     <Compile Include="Commands\IEntityCommandSelect.cs" />
+    <Compile Include="Commands\IEntityCommandSelect.Multi.cs" />
     <Compile Include="DbAccess\DbAccess.cs" />
     <Compile Include="DbAccess\DbAccess.Events.cs" />
     <Compile Include="DbAccess\DbAccess.Execute.cs" />

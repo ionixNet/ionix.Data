@@ -234,6 +234,42 @@
             return QuerySingle(dataAccess, sql, null);
         }
 
+        public static dynamic QuerySingle(this IDbAccess dataAccess, IEntityMetaDataProvider provider, SqlQuery query, MapBy by, char prefix, params Type[] types)
+        {
+            var result = new EntityCommandSelect(dataAccess, prefix).QueryTemplateSingle(provider, query, by, types);
+            if (null != result)
+            {
+                IDictionary<string, object> dic = new ExpandoObject();
+                for (int j = 0; j < types.Length; ++j)
+                {
+                    dic[types[j].Name] = result[j];
+                }
+                return dic;
+            }
+
+            return null;
+        }
+
+        public static List<dynamic> Query(this IDbAccess dataAccess, IEntityMetaDataProvider provider, SqlQuery query, MapBy by, char prefix, params Type[] types)
+        {
+            List<dynamic> ret = new List<dynamic>();
+            var result = new EntityCommandSelect(dataAccess, prefix).QueryTemplate(provider, query, by, types);
+            if (result.Count != 0)
+            {
+                foreach (object[] arr in result)//örneğin 3 lü dönüyor
+                {
+                    IDictionary<string, object> dic = new ExpandoObject();
+                    for (int j = 0; j < types.Length; ++j)
+                    {
+                        dic[types[j].Name] = arr[j];
+                    }
+                    ret.Add(dic);
+                }
+            }
+
+            return ret;
+        }
+
         #endregion
 
         #region   |    DataTable     |

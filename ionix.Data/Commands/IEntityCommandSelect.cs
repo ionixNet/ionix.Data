@@ -27,7 +27,7 @@
             where TEntity : new();
     }
 
-    public class EntityCommandSelect : IEntityCommandSelect
+    public partial class EntityCommandSelect : IEntityCommandSelect
     {
         public EntityCommandSelect(IDbAccess dataAccess, char parameterPrefix)
         {
@@ -216,7 +216,7 @@
 
 
 
-
+        
 
         public virtual TEntity QuerySingle<TEntity>(IEntityMetaDataProvider provider, SqlQuery query)
             where TEntity : new()

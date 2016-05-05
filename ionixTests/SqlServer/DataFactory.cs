@@ -72,20 +72,20 @@ namespace ionixTests.SqlServer
         public static IDbAccess CreatDataAccess()
         {
             DbAccess dataAccess = new DbAccess(CreateDbConnection());
-            dataAccess.ExecuteSqlComplete += (e) =>
-            {
-                OnExecuteSqlComplete(e);
-            };
+            //dataAccess.ExecuteSqlComplete += (e) =>
+            //{
+            //    OnExecuteSqlComplete(e);
+            //};
             return dataAccess;
         }
 
         public static ITransactionalDbAccess CreateTransactionalDataAccess()
         {
             TransactionalDbAccess dataAccess = new TransactionalDbAccess(CreateDbConnection());
-            dataAccess.ExecuteSqlComplete += (e) =>
-            {
-                OnExecuteSqlComplete(e);
-            };
+            //dataAccess.ExecuteSqlComplete += (e) =>
+            //{
+            //    OnExecuteSqlComplete(e);
+            //};
             return dataAccess;
 
         }
