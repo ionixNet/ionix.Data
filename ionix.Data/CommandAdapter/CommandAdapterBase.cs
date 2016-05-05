@@ -32,21 +32,26 @@
             }
         }
 
+        private IEntityCommandSelect CreateSelectCommand()
+        {
+            IEntityCommandSelect cmd = this.factory.CreateSelectCommand();
+            cmd.ConvertType = true;
+            return cmd;
+        }
+
         #region   |      Select     |
 
         public virtual TEntity SelectById<TEntity>(params object[] idValues)
             where TEntity : new()
         {
-            IEntityCommandSelect cmd = this.factory.CreateSelectCommand();
-            cmd.ConvertType = true;
+            var cmd = this.CreateSelectCommand();
             return cmd.SelectById<TEntity>(this.EntityMetaDataProvider, idValues);
         }
 
         public virtual TEntity SelectSingle<TEntity>(SqlQuery extendedQuery)
             where TEntity : new()
         {
-            IEntityCommandSelect cmd = this.factory.CreateSelectCommand();
-            cmd.ConvertType = true;
+            var cmd = this.CreateSelectCommand();
             return cmd.SelectSingle<TEntity>(this.EntityMetaDataProvider, extendedQuery);
         }
 
@@ -55,9 +60,7 @@
         public virtual IList<TEntity> Select<TEntity>(SqlQuery extendedQuery)
             where TEntity : new()
         {
-            IEntityCommandSelect cmd = this.factory.CreateSelectCommand();
-            cmd.ConvertType = true;
-
+            var cmd = this.CreateSelectCommand();
             return cmd.Select<TEntity>(this.EntityMetaDataProvider, extendedQuery);
         }
 
@@ -65,17 +68,87 @@
         public virtual TEntity QuerySingle<TEntity>(SqlQuery query)
             where TEntity : new()
         {
-            IEntityCommandSelect cmd = this.factory.CreateSelectCommand();
-            cmd.ConvertType = true;
+            var cmd = this.CreateSelectCommand();
             return cmd.QuerySingle<TEntity>(this.EntityMetaDataProvider, query);
         }
+        public Tuple<TEntity1, TEntity2> QuerySingle<TEntity1, TEntity2>(SqlQuery query, MapBy by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.QuerySingle<TEntity1, TEntity2>(this.EntityMetaDataProvider, query, by);
+        }
+
+        public Tuple<TEntity1, TEntity2, TEntity3> QuerySingle<TEntity1, TEntity2, TEntity3>(SqlQuery query, MapBy @by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.QuerySingle<TEntity1, TEntity2, TEntity3>(this.EntityMetaDataProvider, query, by);
+        }
+
+        public Tuple<TEntity1, TEntity2, TEntity3, TEntity4> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4>(SqlQuery query, MapBy @by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4>(this.EntityMetaDataProvider, query, by);
+        }
+
+        public Tuple<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5>(SqlQuery query, MapBy @by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5>(this.EntityMetaDataProvider, query, by);
+        }
+
+        public Tuple<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6>(SqlQuery query, MapBy @by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6>(this.EntityMetaDataProvider, query, by);
+        }
+
+        public Tuple<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7>(SqlQuery query, MapBy @by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7>(this.EntityMetaDataProvider, query, by);
+        }
+
+
         public virtual IList<TEntity> Query<TEntity>(SqlQuery query)
             where TEntity : new()
         {
-            IEntityCommandSelect cmd = this.factory.CreateSelectCommand();
-            cmd.ConvertType = true;
-
+            var cmd = this.CreateSelectCommand();
             return cmd.Query<TEntity>(this.EntityMetaDataProvider, query);
+        }
+
+        public Tuple<IList<TEntity1>, IList<TEntity2>> Query<TEntity1, TEntity2>(SqlQuery query, MapBy @by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.Query<TEntity1, TEntity2>(this.EntityMetaDataProvider, query, by);
+        }
+
+        public Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>> Query<TEntity1, TEntity2, TEntity3>(SqlQuery query, MapBy @by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.Query<TEntity1, TEntity2, TEntity3>(this.EntityMetaDataProvider, query, by);
+        }
+
+        public Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>> Query<TEntity1, TEntity2, TEntity3, TEntity4>(SqlQuery query, MapBy @by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.Query<TEntity1, TEntity2, TEntity3, TEntity4>(this.EntityMetaDataProvider, query, by);
+        }
+
+        public Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>, IList<TEntity5>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5>(SqlQuery query, MapBy @by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5>(this.EntityMetaDataProvider, query, by);
+        }
+
+        public Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>, IList<TEntity5>, IList<TEntity6>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6>(SqlQuery query, MapBy @by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6>(this.EntityMetaDataProvider, query, by);
+        }
+
+        public Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>, IList<TEntity5>, IList<TEntity6>, IList<TEntity7>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7>(SqlQuery query, MapBy @by)
+        {
+            var cmd = this.CreateSelectCommand();
+            return cmd.Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7>(this.EntityMetaDataProvider, query, by);
         }
 
         #endregion

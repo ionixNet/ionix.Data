@@ -22,9 +22,22 @@
 
         TEntity QuerySingle<TEntity>(IEntityMetaDataProvider provider, SqlQuery query)//Property adı kolondan farklı olan durumlar için IEntityMetaDataProvider provider eklendi.
             where TEntity : new();
+        Tuple<TEntity1, TEntity2> QuerySingle<TEntity1, TEntity2>(IEntityMetaDataProvider provider, SqlQuery query,MapBy by);
+        Tuple<TEntity1, TEntity2, TEntity3> QuerySingle<TEntity1, TEntity2, TEntity3>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
+        Tuple<TEntity1, TEntity2, TEntity3, TEntity4> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
+        Tuple<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5>(IEntityMetaDataProvider provider, SqlQuery query,MapBy by);
+        Tuple<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6>(IEntityMetaDataProvider provider,SqlQuery query, MapBy by);
+        Tuple<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
+
 
         IList<TEntity> Query<TEntity>(IEntityMetaDataProvider provider, SqlQuery query)
             where TEntity : new();
+        Tuple<IList<TEntity1>, IList<TEntity2>> Query<TEntity1, TEntity2>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
+        Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>> Query<TEntity1, TEntity2, TEntity3>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
+        Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>> Query<TEntity1, TEntity2, TEntity3, TEntity4>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
+        Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>, IList<TEntity5>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
+        Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>, IList<TEntity5>, IList<TEntity6>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
+        Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>, IList<TEntity5>, IList<TEntity6>, IList<TEntity7>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
     }
 
     public partial class EntityCommandSelect : IEntityCommandSelect

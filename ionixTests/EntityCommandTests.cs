@@ -230,35 +230,34 @@ namespace ionixTests
         {
             using (var c = DataFactory.CretDbClient())
             {
-                EntityCommandSelect cmd = new EntityCommandSelect(c.DataAccess, '@');
-
-                var provider = new DbSchemaMetaDataProvider();
+                var cmd = c.Cmd;// new EntityCommandSelect(c.DataAccess, '@');
 
                 SqlQuery q = @"select top 1 o.*, c.* from Orders o
                 inner join Customers c on o.CustomerID = c.CustomerID".ToQuery();
 
-                var order = cmd.QuerySingle<Orders, Customers>(provider, q, MapBy.Name);
+                var order = cmd.QuerySingle<Orders, Customers>(q, MapBy.Name);
 
                 for (int j = 0; j < 1000; ++j)
                 {
-                    order = cmd.QuerySingle<Orders, Customers>(provider, q, MapBy.Name);
-                    order = cmd.QuerySingle<Orders, Customers>(provider, q, MapBy.Sequence);
+                    order = cmd.QuerySingle<Orders, Customers>(q, MapBy.Name);
+                    order = cmd.QuerySingle<Orders, Customers>(q, MapBy.Sequence);
                 }
 
-                order = cmd.QuerySingle<Orders, Customers>(provider, q, MapBy.Sequence);
+                order = cmd.QuerySingle<Orders, Customers>(q, MapBy.Sequence);
 
                 q = @"select top 1 o.ShipName, o.ShipCountry, c.ContactName, c.Country from Orders o
                 inner join Customers c on o.CustomerID = c.CustomerID".ToQuery();
 
-                order = cmd.QuerySingle<Orders, Customers>(provider, q, MapBy.Name);
+                order = cmd.QuerySingle<Orders, Customers>(q, MapBy.Name);
                // order = cmd.QuerySingle<Orders, Customers>(provider, q, MapBy.Sequence);
 
 
                 q = @"select top 1 o.*, c.*, e.* from Orders o
                 inner join Customers c on o.CustomerID = c.CustomerID
                 inner join Employees e on o.EmployeeID = e.EmployeeID".ToQuery();
-                var order3 = cmd.QuerySingle<Orders, Customers, Employees>(provider, q, MapBy.Name);
+                var order3 = cmd.QuerySingle<Orders, Customers, Employees>(q, MapBy.Name);
 
+                var provider = new DbSchemaMetaDataProvider();
                 dynamic dyn = c.DataAccess.QuerySingle(provider, q, MapBy.Name, '@', typeof(Orders), typeof(Customers), typeof(Employees));
                 dyn = c.DataAccess.QuerySingle(provider, q, MapBy.Sequence, '@', typeof(Orders), typeof(Customers), typeof(Employees));
 
@@ -267,7 +266,7 @@ namespace ionixTests
                     inner join Customers c on o.CustomerID = c.CustomerID
                     inner join Employees e on o.EmployeeID = e.EmployeeID".ToQuery();
 
-                order3 = cmd.QuerySingle<Orders, Customers, Employees>(provider, q, MapBy.Name);
+                order3 = cmd.QuerySingle<Orders, Customers, Employees>(q, MapBy.Name);
 
                 dyn = c.DataAccess.QuerySingle(provider, q, MapBy.Name, '@', typeof(Orders), typeof(Customers), typeof(Employees));
 
@@ -281,34 +280,34 @@ namespace ionixTests
         {
             using (var c = DataFactory.CretDbClient())
             {
-                EntityCommandSelect cmd = new EntityCommandSelect(c.DataAccess, '@');
+                var cmd = c.Cmd;// new EntityCommandSelect(c.DataAccess, '@');
 
                 var provider = new DbSchemaMetaDataProvider();
 
                 SqlQuery q = @"select o.*, c.* from Orders o
                 inner join Customers c on o.CustomerID = c.CustomerID".ToQuery();
 
-                var order = cmd.Query<Orders, Customers>(provider, q, MapBy.Name);
-                order = cmd.Query<Orders, Customers>(provider, q, MapBy.Sequence);
+                var order = cmd.Query<Orders, Customers>(q, MapBy.Name);
+                order = cmd.Query<Orders, Customers>(q, MapBy.Sequence);
 
                 q = @"select o.ShipName, o.ShipCountry, c.ContactName, c.Country from Orders o
                 inner join Customers c on o.CustomerID = c.CustomerID".ToQuery();
 
-                order = cmd.Query<Orders, Customers>(provider, q, MapBy.Name);
+                order = cmd.Query<Orders, Customers>(q, MapBy.Name);
                 // order = cmd.QuerySingle<Orders, Customers>(provider, q, MapBy.Sequence);
 
                 q = @"select o.*, c.*, e.* from Orders o
                 inner join Customers c on o.CustomerID = c.CustomerID
                 inner join Employees e on o.EmployeeID = e.EmployeeID".ToQuery();
-                var order3 = cmd.Query<Orders, Customers, Employees>(provider, q, MapBy.Name);
+                var order3 = cmd.Query<Orders, Customers, Employees>(q, MapBy.Name);
                 dynamic dyn = c.DataAccess.Query(provider, q, MapBy.Name, '@', typeof(Orders), typeof(Customers), typeof(Employees));
                 dyn = c.DataAccess.Query(provider, q, MapBy.Sequence, '@',typeof(Orders), typeof(Customers), typeof(Employees));
 
 
                 for (int j = 0; j < 10; ++j)
                 {
-                    order3 = cmd.Query<Orders, Customers, Employees>(provider, q, MapBy.Name);
-                    order3 = cmd.Query<Orders, Customers, Employees>(provider, q, MapBy.Sequence);
+                    order3 = cmd.Query<Orders, Customers, Employees>(q, MapBy.Name);
+                    order3 = cmd.Query<Orders, Customers, Employees>(q, MapBy.Sequence);
                 }
 
 
