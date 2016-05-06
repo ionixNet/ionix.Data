@@ -42,20 +42,20 @@
         }
 
 
-        public static SqlQuery Where(this SqlQuery query, ExpandoObject where, char prefix)
-        {
-            if (null != query && null != where)
-            {
-                IDictionary<string, object> dic = where;
-                FilterCriteriaList criterias = new FilterCriteriaList(prefix);
-                foreach (KeyValuePair<string, object> kvp in dic)
-                {
-                    criterias.Add(kvp.Key, null, ConditionOperator.Equals, kvp.Value);
-                }
+        //public static SqlQuery Where(this SqlQuery query, ExpandoObject where, char prefix)
+        //{
+        //    if (null != query && null != where)
+        //    {
+        //        IDictionary<string, object> dic = where;
+        //        FilterCriteriaList criterias = new FilterCriteriaList(prefix);
+        //        foreach (KeyValuePair<string, object> kvp in dic)
+        //        {
+        //            criterias.Add(kvp.Key, null, ConditionOperator.Equals, kvp.Value);
+        //        }
 
-                query.Combine(criterias.ToQuery());
-            }
-            return query;
-        }
+        //        query.Combine(criterias.ToQuery());
+        //    }
+        //    return query;
+        //}
     }
 }

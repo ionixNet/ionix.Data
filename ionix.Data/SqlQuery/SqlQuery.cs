@@ -96,5 +96,21 @@
 
             return this;
         }
+        //public SqlQuery Parameter(dynamic parameters)
+        //{
+        //    if (null != parameters)
+        //    {
+        //        foreach (PropertyInfo prop in parameters.GetType().GetProperties())
+        //        {
+        //            string parameterName = prop.Name;
+        //            object value = prop.GetValue(this.parameters);
+
+        //            this.Parameters.Add(parameterName, value);
+        //        }
+        //     //   this.Parameters.Add(parameterName, value);
+        //    }
+
+        //    return this;
+        //}
     }
 }
