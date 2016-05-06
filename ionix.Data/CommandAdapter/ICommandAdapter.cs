@@ -9,13 +9,16 @@
 
         TEntity SelectById<TEntity>(params object[] idValues)
             where TEntity : new();
+
         TEntity SelectSingle<TEntity>(SqlQuery extendedQuery)
             where TEntity : new();
+
         IList<TEntity> Select<TEntity>(SqlQuery extendedQuery)
             where TEntity : new();
 
         TEntity QuerySingle<TEntity>(SqlQuery query)
             where TEntity : new();
+
         Tuple<TEntity1, TEntity2> QuerySingle<TEntity1, TEntity2>(SqlQuery query, MapBy by);
         Tuple<TEntity1, TEntity2, TEntity3> QuerySingle<TEntity1, TEntity2, TEntity3>(SqlQuery query, MapBy by);
         Tuple<TEntity1, TEntity2, TEntity3, TEntity4> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4>(SqlQuery query, MapBy by);
@@ -26,12 +29,13 @@
 
         IList<TEntity> Query<TEntity>(SqlQuery query)
             where TEntity : new();
-        Tuple<IList<TEntity1>, IList<TEntity2>> Query<TEntity1, TEntity2>(SqlQuery query, MapBy by);
-        Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>> Query<TEntity1, TEntity2, TEntity3>(SqlQuery query, MapBy by);
-        Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>> Query<TEntity1, TEntity2, TEntity3, TEntity4>(SqlQuery query, MapBy by);
-        Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>, IList<TEntity5>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5>(SqlQuery query, MapBy by);
-        Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>, IList<TEntity5>, IList<TEntity6>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6>(SqlQuery query, MapBy by);
-        Tuple<IList<TEntity1>, IList<TEntity2>, IList<TEntity3>, IList<TEntity4>, IList<TEntity5>, IList<TEntity6>, IList<TEntity7>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7>(SqlQuery query, MapBy by);
+
+        IList<Tuple<TEntity1, TEntity2>> Query<TEntity1, TEntity2>(SqlQuery query, MapBy by);
+        IList<Tuple<TEntity1, TEntity2, TEntity3>> Query<TEntity1, TEntity2, TEntity3>(SqlQuery query, MapBy by);
+        IList<Tuple<TEntity1, TEntity2, TEntity3, TEntity4>> Query<TEntity1, TEntity2, TEntity3, TEntity4>(SqlQuery query, MapBy by);
+        IList<Tuple<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5>(SqlQuery query, MapBy by);
+        IList<Tuple<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6>(SqlQuery query, MapBy by);
+        IList<Tuple<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7>> Query<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7>(SqlQuery query, MapBy by);
 
 
         int Update<TEntity>(TEntity entity, params string[] updatedFields);

@@ -256,7 +256,7 @@
             var result = new EntityCommandSelect(dataAccess, prefix).QueryTemplate(provider, query, by, types);
             if (result.Count != 0)
             {
-                foreach (object[] arr in result)//örneğin 3 lü dönüyor
+                foreach (object[] arr in result)
                 {
                     IDictionary<string, object> dic = new ExpandoObject();
                     for (int j = 0; j < types.Length; ++j)

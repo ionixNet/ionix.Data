@@ -300,6 +300,7 @@ namespace ionixTests
                 inner join Customers c on o.CustomerID = c.CustomerID
                 inner join Employees e on o.EmployeeID = e.EmployeeID".ToQuery();
                 var order3 = cmd.Query<Orders, Customers, Employees>(q, MapBy.Name);
+                order3 = cmd.Query<Orders, Customers, Employees>(q, MapBy.Sequence);
                 dynamic dyn = c.DataAccess.Query(provider, q, MapBy.Name, '@', typeof(Orders), typeof(Customers), typeof(Employees));
                 dyn = c.DataAccess.Query(provider, q, MapBy.Sequence, '@',typeof(Orders), typeof(Customers), typeof(Employees));
 
