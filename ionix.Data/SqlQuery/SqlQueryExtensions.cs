@@ -95,5 +95,15 @@
 
             return q;
         }
+
+        //Useage;
+        //SqlQuery q = "select t.* from Person t where t.No:@No and t.Adi=@Adi".ToQuery2(new { No = 1, Adi = "Mehmet" });
+
+        //q ="select * from (select 1 as Id union all select 2 union all select 3) as X where Id in @Ids".ToQuery2(new{Ids = new [] {1, 2, 3}});
+
+        //    q =
+        //        "select * from Person p where p.Id in @Ids and p.No in @Nos and p.Adi like '@Adi%'".ToQuery2(
+        //            new {Ids = new[] {1, 2, 3}, Nos = new[] {"12", "42"}, Adi = "Mehmet"});
+
     }
 }
