@@ -1,8 +1,11 @@
 ﻿namespace ionix.Data
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
-    using System.Dynamic;
+    using System.Reflection;
+    using System.Text;
+    using Utils;
 
     public static class SqlQueryExtensions
     {
@@ -42,20 +45,55 @@
         }
 
 
-        //public static SqlQuery Where(this SqlQuery query, ExpandoObject where, char prefix)
-        //{
-        //    if (null != query && null != where)
-        //    {
-        //        IDictionary<string, object> dic = where;
-        //        FilterCriteriaList criterias = new FilterCriteriaList(prefix);
-        //        foreach (KeyValuePair<string, object> kvp in dic)
-        //        {
-        //            criterias.Add(kvp.Key, null, ConditionOperator.Equals, kvp.Value);
-        //        }
+        private static readonly HashSet<Type> collTtpes = new HashSet<Type>
+        {
+            CachedTypes.String,
+            CachedTypes.ByteArray
+        };
+        public static SqlQuery ToQuery2(this string sql, dynamic parameters)
+        {
+            SqlQuery q = new SqlQuery();
+            if (null != parameters)
+            {
+                foreach (PropertyInfo pi in parameters.GetType().GetProperties())
+                {
+                    bool flag = false;
+                    object value = pi.GetValue(parameters);
 
-        //        query.Combine(criterias.ToQuery());
-        //    }
-        //    return query;
-        //}
+                    if (null != value)
+                    {
+                        Type valueType = value.GetType();
+                        if (!collTtpes.Contains(valueType))
+                        {
+                            IEnumerable list = value as IEnumerable;
+                            if (null != list)
+                            {
+                                char prefix = sql.Contains("@") ? '@' : ':';
+                                StringBuilder sb = new StringBuilder("(");
+                                int index = 0;
+                                foreach (var item in list)
+                                {
+                                    sb.Append(prefix)
+                                        .Append(pi.Name + index)
+                                        .Append(',');
+                                    q.Parameters.Add(pi.Name + index, item);
+                                    ++index;
+                                }
+                                sb.Remove(sb.Length - 1, 1);
+                                sb.Append(')');
+
+                                sql = sql.Replace(prefix + pi.Name, sb.ToString());
+                                flag = true;
+                            }
+                        }
+                    }
+                    if (!flag)
+                        q.Parameter(pi.Name, value);
+                }
+            }
+            q.Sql(sql);
+
+            return q;
+        }
     }
 }
