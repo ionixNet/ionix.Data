@@ -1,5 +1,6 @@
 ﻿namespace ionix.Data
 {
+    using Utils;
     using Utils.Extensions;
     using System;
     using System.Collections.Generic;
@@ -19,6 +20,8 @@
 
         public ICommandFactory Factory => this.factory;
 
+        public bool ConvertType { get; set; } = true;
+
         protected abstract IEntityMetaDataProvider CreateProvider();
 
         private IEntityMetaDataProvider entityMetaDataProvider;
@@ -35,41 +38,58 @@
         private IEntityCommandSelect CreateSelectCommand()
         {
             IEntityCommandSelect cmd = this.factory.CreateSelectCommand();
-            cmd.ConvertType = true;
+            cmd.ConvertType = this.ConvertType;
             return cmd;
         }
 
         #region   |      Select     |
 
         public virtual TEntity SelectById<TEntity>(params object[] idValues)
-            where TEntity : new()
         {
             var cmd = this.CreateSelectCommand();
             return cmd.SelectById<TEntity>(this.EntityMetaDataProvider, idValues);
         }
 
         public virtual TEntity SelectSingle<TEntity>(SqlQuery extendedQuery)
-            where TEntity : new()
         {
             var cmd = this.CreateSelectCommand();
             return cmd.SelectSingle<TEntity>(this.EntityMetaDataProvider, extendedQuery);
         }
 
-
-
         public virtual IList<TEntity> Select<TEntity>(SqlQuery extendedQuery)
-            where TEntity : new()
         {
             var cmd = this.CreateSelectCommand();
             return cmd.Select<TEntity>(this.EntityMetaDataProvider, extendedQuery);
         }
 
+        #endregion
+
+
+        #region   |      Query     |
+
+        private static readonly HashSet<Type> PrimitiveTypes = new HashSet<Type>()
+        {
+            CachedTypes.String,
+            CachedTypes.Boolean, CachedTypes.Byte,CachedTypes.ByteArray,CachedTypes.Char,CachedTypes.DateTime,CachedTypes.Decimal,CachedTypes.Double, CachedTypes.Single,
+            CachedTypes.Guid,CachedTypes.Int16,CachedTypes.Int32,CachedTypes.Int64, CachedTypes.UInt16, CachedTypes.UInt32, CachedTypes.UInt64, CachedTypes.SByte,
+            CachedTypes.Nullable_Boolean, CachedTypes.Nullable_Byte, CachedTypes.Nullable_Char,CachedTypes.Nullable_DateTime, CachedTypes.Nullable_Single,
+            CachedTypes.Nullable_Decimal,CachedTypes.Nullable_Double,CachedTypes.Nullable_Guid,CachedTypes.Nullable_Int16,CachedTypes.Nullable_Int32,CachedTypes.Nullable_Int64
+            ,CachedTypes.Nullable_UInt16, CachedTypes.Nullable_UInt32, CachedTypes.Nullable_UInt64, CachedTypes.Nullable_SByte
+        };
 
         public virtual TEntity QuerySingle<TEntity>(SqlQuery query)
-            where TEntity : new()
         {
-            var cmd = this.CreateSelectCommand();
-            return cmd.QuerySingle<TEntity>(this.EntityMetaDataProvider, query);
+            if (PrimitiveTypes.Contains(typeof (TEntity)))
+            {
+                return this.ConvertType
+                    ? this.factory.DataAccess.ExecuteScalarSafely<TEntity>(query)
+                    : this.factory.DataAccess.ExecuteScalar<TEntity>(query);
+            }
+            else
+            {
+                var cmd = this.CreateSelectCommand();
+                return cmd.QuerySingle<TEntity>(this.EntityMetaDataProvider, query);
+            }
         }
         public Tuple<TEntity1, TEntity2> QuerySingle<TEntity1, TEntity2>(SqlQuery query, MapBy by)
         {
@@ -109,10 +129,16 @@
 
 
         public virtual IList<TEntity> Query<TEntity>(SqlQuery query)
-            where TEntity : new()
         {
-            var cmd = this.CreateSelectCommand();
-            return cmd.Query<TEntity>(this.EntityMetaDataProvider, query);
+            if (PrimitiveTypes.Contains(typeof(TEntity)))
+            {
+                return this.factory.DataAccess.ExecuteScalarList<TEntity>(query);
+            }
+            else
+            {
+                var cmd = this.CreateSelectCommand();
+                return cmd.Query<TEntity>(this.EntityMetaDataProvider, query);
+            }
         }
 
         public IList<Tuple<TEntity1, TEntity2>> Query<TEntity1, TEntity2>(SqlQuery query, MapBy by)
@@ -127,7 +153,7 @@
             return cmd.Query<TEntity1, TEntity2, TEntity3>(this.EntityMetaDataProvider, query, by);
         }
 
-        public IList<Tuple<TEntity1,TEntity2, TEntity3, TEntity4>> Query<TEntity1, TEntity2, TEntity3, TEntity4>(SqlQuery query, MapBy by)
+        public IList<Tuple<TEntity1, TEntity2, TEntity3, TEntity4>> Query<TEntity1, TEntity2, TEntity3, TEntity4>(SqlQuery query, MapBy by)
         {
             var cmd = this.CreateSelectCommand();
             return cmd.Query<TEntity1, TEntity2, TEntity3, TEntity4>(this.EntityMetaDataProvider, query, by);

@@ -6,18 +6,15 @@
     public interface ICommandAdapter
     {
         ICommandFactory Factory { get; }
+        bool ConvertType { get; set; }
 
-        TEntity SelectById<TEntity>(params object[] idValues)
-            where TEntity : new();
+        TEntity SelectById<TEntity>(params object[] idValues);
 
-        TEntity SelectSingle<TEntity>(SqlQuery extendedQuery)
-            where TEntity : new();
+        TEntity SelectSingle<TEntity>(SqlQuery extendedQuery);
 
-        IList<TEntity> Select<TEntity>(SqlQuery extendedQuery)
-            where TEntity : new();
+        IList<TEntity> Select<TEntity>(SqlQuery extendedQuery);
 
-        TEntity QuerySingle<TEntity>(SqlQuery query)
-            where TEntity : new();
+        TEntity QuerySingle<TEntity>(SqlQuery query);
 
         Tuple<TEntity1, TEntity2> QuerySingle<TEntity1, TEntity2>(SqlQuery query, MapBy by);
         Tuple<TEntity1, TEntity2, TEntity3> QuerySingle<TEntity1, TEntity2, TEntity3>(SqlQuery query, MapBy by);
@@ -27,8 +24,7 @@
         Tuple<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7>(SqlQuery query, MapBy by);
 
 
-        IList<TEntity> Query<TEntity>(SqlQuery query)
-            where TEntity : new();
+        IList<TEntity> Query<TEntity>(SqlQuery query);
 
         IList<Tuple<TEntity1, TEntity2>> Query<TEntity1, TEntity2>(SqlQuery query, MapBy by);
         IList<Tuple<TEntity1, TEntity2, TEntity3>> Query<TEntity1, TEntity2, TEntity3>(SqlQuery query, MapBy by);

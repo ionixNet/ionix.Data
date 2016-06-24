@@ -9,6 +9,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ionixTests
 {
+    using System.Collections;
+
     [TestClass]
     public class EntityCommandTests
     {
@@ -314,6 +316,38 @@ namespace ionixTests
 
                 Assert.IsNotNull(order);
 
+            }
+        }
+
+
+        [TestMethod]
+        public void QuerySingleEntityPrimitiveTest()
+        {
+            using (var c = DataFactory.CretDbClient())
+            {
+                object result = c.Cmd.QuerySingle<Customers>("select top 1 * from Customers".ToQuery());
+
+                result = c.Cmd.QuerySingle<int>("select top 1 CategoryID from Categories".ToQuery());
+
+                result = c.Cmd.QuerySingle<string>("select top 1 CategoryName from Categories".ToQuery());
+
+                Assert.IsNotNull(result);
+            }
+        }
+
+
+        [TestMethod]
+        public void QueryEntityPrimitiveTest()
+        {
+            using (var c = DataFactory.CretDbClient())
+            {
+                IEnumerable result = c.Cmd.Query<Customers>("select * from Customers".ToQuery());
+
+                result = c.Cmd.Query<int>("select CategoryID from Categories".ToQuery());
+
+                result = c.Cmd.Query<string>("select CategoryName from Categories".ToQuery());
+
+                Assert.IsNotNull(result);
             }
         }
     }

@@ -11,17 +11,13 @@
     {
         bool ConvertType { get; set; }
 
-        TEntity SelectById<TEntity>(IEntityMetaDataProvider provider, params object[] keys)
-            where TEntity : new();
+        TEntity SelectById<TEntity>(IEntityMetaDataProvider provider, params object[] keys);
 
-        TEntity SelectSingle<TEntity>(IEntityMetaDataProvider provider, SqlQuery extendedQuery)
-            where TEntity : new();
+        TEntity SelectSingle<TEntity>(IEntityMetaDataProvider provider, SqlQuery extendedQuery);
 
-        IList<TEntity> Select<TEntity>(IEntityMetaDataProvider provider, SqlQuery extendedQuery)
-            where TEntity : new();
+        IList<TEntity> Select<TEntity>(IEntityMetaDataProvider provider, SqlQuery extendedQuery);
 
-        TEntity QuerySingle<TEntity>(IEntityMetaDataProvider provider, SqlQuery query)//Property adı kolondan farklı olan durumlar için IEntityMetaDataProvider provider eklendi.
-            where TEntity : new();
+        TEntity QuerySingle<TEntity>(IEntityMetaDataProvider provider, SqlQuery query);//Property adı kolondan farklı olan durumlar için IEntityMetaDataProvider provider eklendi.
         Tuple<TEntity1, TEntity2> QuerySingle<TEntity1, TEntity2>(IEntityMetaDataProvider provider, SqlQuery query,MapBy by);
         Tuple<TEntity1, TEntity2, TEntity3> QuerySingle<TEntity1, TEntity2, TEntity3>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
         Tuple<TEntity1, TEntity2, TEntity3, TEntity4> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
@@ -30,8 +26,7 @@
         Tuple<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7> QuerySingle<TEntity1, TEntity2, TEntity3, TEntity4, TEntity5, TEntity6, TEntity7>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
 
 
-        IList<TEntity> Query<TEntity>(IEntityMetaDataProvider provider, SqlQuery query)
-            where TEntity : new();
+        IList<TEntity> Query<TEntity>(IEntityMetaDataProvider provider, SqlQuery query);
         IList<Tuple<TEntity1, TEntity2>> Query<TEntity1, TEntity2>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
         IList<Tuple<TEntity1, TEntity2, TEntity3>> Query<TEntity1, TEntity2, TEntity3>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
         IList<Tuple<TEntity1, TEntity2, TEntity3, TEntity4>> Query<TEntity1, TEntity2, TEntity3, TEntity4>(IEntityMetaDataProvider provider, SqlQuery query, MapBy by);
@@ -122,7 +117,6 @@
         }
 
         private TEntity ReadEntity<TEntity>(IEntityMetaData metaData, SqlQuery query, MapType mapType)
-            where TEntity : new()
         {
             IDataReader dr = null;
             try
@@ -131,7 +125,7 @@
 
                 if (dr.Read())
                 {
-                    TEntity entity = new TEntity();
+                    TEntity entity = Activator.CreateInstance<TEntity>();
                     this.Map<TEntity>(entity, metaData, dr, mapType);
                     return entity;
                 }
@@ -145,7 +139,6 @@
         }
 
         private IList<TEntity> ReadEntityList<TEntity>(IEntityMetaData metaData, SqlQuery query, MapType mapType)
-            where TEntity : new()
         {
             List<TEntity> ret = new List<TEntity>();
 
@@ -156,7 +149,7 @@
                 //ret.Capacity = dr.FieldCount; ??? ne bu
                 while (dr.Read())
                 {
-                    TEntity entity = new TEntity();
+                    TEntity entity = Activator.CreateInstance<TEntity>();
                     this.Map<TEntity>(entity, metaData, dr, mapType);
                     ret.Add(entity);
                 }
@@ -170,7 +163,6 @@
         }
 
         public virtual TEntity SelectById<TEntity>(IEntityMetaDataProvider provider, params object[] keys)
-            where TEntity : new()
         {
             if (keys.IsEmptyList())
                 throw new ArgumentNullException(nameof(keys));
@@ -197,8 +189,8 @@
 
             return this.ReadEntity<TEntity>(metaData, query, MapType.Select);
         }
+
         public virtual TEntity SelectSingle<TEntity>(IEntityMetaDataProvider provider, SqlQuery extendedQuery)
-            where TEntity : new()
         {
             IEntityMetaData metaData = provider.EnsureCreateEntityMetaData<TEntity>();
 
@@ -210,9 +202,7 @@
             return this.ReadEntity<TEntity>(metaData, query, MapType.Select);
         }
 
-
         public IList<TEntity> Select<TEntity>(IEntityMetaDataProvider provider, SqlQuery extendedQuery)
-            where TEntity : new()
         {
             if (null == provider)
                 throw new ArgumentNullException(nameof(provider));
@@ -226,13 +216,8 @@
 
             return this.ReadEntityList<TEntity>(metaData, query, MapType.Select);
         }
-
-
-
-        
-
+    
         public virtual TEntity QuerySingle<TEntity>(IEntityMetaDataProvider provider, SqlQuery query)
-            where TEntity : new()
         {
             if (null == query)
                 throw new ArgumentNullException(nameof(query));
@@ -242,9 +227,7 @@
             return this.ReadEntity<TEntity>(metaData, query, MapType.Query);
         }
 
-
         public virtual IList<TEntity> Query<TEntity>(IEntityMetaDataProvider provider, SqlQuery query)
-            where TEntity : new()
         {
             if (null == query)
                 throw new ArgumentNullException(nameof(query));

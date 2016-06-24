@@ -40,7 +40,7 @@
             return ExecuteScalar(dataAccess, sql, null);
         }
         //Restful Servisler İçin Eklendi
-        public static IEnumerable<object> ExecuteScalarList(this IDbAccess dataAccess, SqlQuery query)
+        public static IList<object> ExecuteScalarList(this IDbAccess dataAccess, SqlQuery query)
         {
             EnsureDbAccess(dataAccess);
 
@@ -56,11 +56,11 @@
             }
             return ret;
         }
-        public static IEnumerable<object> ExecuteScalarList(this IDbAccess dataAccess, string sql, params object[] pars)
+        public static IList<object> ExecuteScalarList(this IDbAccess dataAccess, string sql, params object[] pars)
         {
             return ExecuteScalarList(dataAccess, sql.ToQuery(pars));
         }
-        public static IEnumerable<object> ExecuteScalarList(this IDbAccess dataAccess, string sql)
+        public static IList<object> ExecuteScalarList(this IDbAccess dataAccess, string sql)
         {
             return ExecuteScalarList(dataAccess, sql, null);
         }
@@ -123,7 +123,7 @@
         }
 
 
-        public static IEnumerable<T> ExecuteScalarList<T>(this IDbAccess dataAccess, SqlQuery query)
+        public static IList<T> ExecuteScalarList<T>(this IDbAccess dataAccess, SqlQuery query)
         {
             EnsureDbAccess(dataAccess);
 
@@ -139,11 +139,11 @@
             }
             return ret;
         }
-        public static IEnumerable<T> ExecuteScalarList<T>(this IDbAccess dataAccess, string sql, params object[] pars)
+        public static IList<T> ExecuteScalarList<T>(this IDbAccess dataAccess, string sql, params object[] pars)
         {
             return ExecuteScalarList<T>(dataAccess, sql.ToQuery(pars));
         }
-        public static IEnumerable<T> ExecuteScalarList<T>(this IDbAccess dataAccess, string sql)
+        public static IList<T> ExecuteScalarList<T>(this IDbAccess dataAccess, string sql)
         {
             return ExecuteScalarList<T>(dataAccess, sql, null);
         }
