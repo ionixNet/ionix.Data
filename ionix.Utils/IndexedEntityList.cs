@@ -69,7 +69,10 @@
                 int hash = 0;
                 for (int j = 0; j < length; ++j)
                 {
-                    hash ^= this.keys[j].GetHashCode();
+                    object keyValue = this.keys[j];
+                    if (null == keyValue)
+                        throw new NullReferenceException("IndexedEntityList' s key value is null");
+                    hash ^= keyValue.GetHashCode();
                 }
                 return hash;
             }

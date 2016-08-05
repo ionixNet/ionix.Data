@@ -7,6 +7,7 @@
     using System.Runtime.Serialization.Formatters.Binary;
     using System.Threading;
     using System.Linq;
+    using System.Linq.Expressions;
     using Reflection;
 
 
@@ -237,6 +238,19 @@
                     throw new NotSupportedException(targetType.FullName);
             }
             return value;
+        }
+
+        public static IEnumerable<T> RemoveEmptyItemsBy<T>(this IEnumerable<T> list, Expression<Func<T, object>> prop)
+        {
+            if (!list.IsEmptyList() && null != prop)
+            {
+                var pi = ReflectionExtensions.GetPropertyInfo(prop);
+                if (null != pi)
+                {
+                    return list.Where(i => !pi.GetValue(i).IsNull());//.ToList();
+                }
+            }
+            return list;
         }
     }
 }
