@@ -5,12 +5,12 @@
     using System.ComponentModel;
     using System.Data;
     using System.Threading.Tasks;
-    using ionix.Utils.Extensions;
 
 
     public static class BulkCopyCommandExtensions
     {
-        public static Task ExecuteAsync<TEntity>(this IBulkCopyCommand cmd, IEnumerable<TEntity> entityList, IEntityMetaDataProvider provider)
+        public static Task ExecuteAsync<TEntity>(this IBulkCopyCommand cmd, IEnumerable<TEntity> entityList,
+            IEntityMetaDataProvider provider)
         {
             return Task.Run(() =>
             {
@@ -32,11 +32,11 @@
         {
             Type entityType = typeof(TEntity);
             DataTable table = new DataTable(entityType.Name);
-            if (!entityList.IsEmptyList())
+            PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(entityType);
+            foreach (PropertyDescriptor prop in properties)
+                table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
+            if (null != entityList)
             {
-                PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(entityType);
-                foreach (PropertyDescriptor prop in properties)
-                    table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
                 foreach (TEntity item in entityList)
                 {
                     DataRow row = table.NewRow();
@@ -44,25 +44,28 @@
                         row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;
                     table.Rows.Add(row);
                 }
-                return table;
             }
             return table;
         }
 
-        public static DataTable ToDataTable<TEntity>(this IEnumerable<TEntity> entityList, IEntityMetaDataProvider provider)
+        public static DataTable ToDataTable<TEntity>(this IEnumerable<TEntity> entityList,
+            IEntityMetaDataProvider provider)
         {
+            if (null == provider)
+                throw new ArgumentNullException(nameof(provider));
+
             DataTable ret = new DataTable();
-            if (null != provider && !entityList.IsEmptyList())
+            IEntityMetaData metaData = provider.CreateEntityMetaData(typeof(TEntity));
+            if (null != metaData)
             {
-                IEntityMetaData metaData = provider.CreateEntityMetaData(typeof(TEntity));
-                if (null != metaData)
+                ret.TableName = metaData.TableName;
+                foreach (PropertyMetaData prop in metaData.Properties)
                 {
-                    ret.TableName = metaData.TableName;
-                    foreach (PropertyMetaData prop in metaData.Properties)
-                    {
-                        SchemaInfo schema = prop.Schema;
-                        ret.Columns.Add(schema.ColumnName, schema.DataType);
-                    }
+                    SchemaInfo schema = prop.Schema;
+                    ret.Columns.Add(schema.ColumnName, schema.DataType);
+                }
+                if (null != entityList)
+                {
                     foreach (TEntity item in entityList)
                     {
                         DataRow row = ret.NewRow();
