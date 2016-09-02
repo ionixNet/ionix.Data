@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Threading.Tasks;
 using ionix.Data;
 using ionix.Utils.Extensions;
@@ -346,6 +347,30 @@ namespace ionixTests
                 result = c.Cmd.Query<int>("select CategoryID from Categories".ToQuery());
 
                 result = c.Cmd.Query<string>("select CategoryName from Categories".ToQuery());
+
+                Assert.IsNotNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void DynamicQuerySingleTest()
+        {
+            using (var c = DataFactory.CretDbClient())
+            {
+                var result = c.Cmd.QuerySingle<dynamic>("select top 1 * from Customers".ToQuery());
+                var result2 = c.Cmd.QuerySingle<ExpandoObject>("select top 1 * from Customers".ToQuery());
+
+                Assert.IsNotNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void DynamicQueryTest()
+        {
+            using (var c = DataFactory.CretDbClient())
+            {
+                var result = c.Cmd.Query<dynamic>("select * from Customers".ToQuery());
+                var result2 = c.Cmd.Query<ExpandoObject>("select * from Customers".ToQuery());
 
                 Assert.IsNotNull(result);
             }

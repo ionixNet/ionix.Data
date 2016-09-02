@@ -1,4 +1,6 @@
-﻿namespace ionix.Data
+﻿using System.Dynamic;
+
+namespace ionix.Data
 {
     using Utils;
     using Utils.Extensions;
@@ -67,6 +69,8 @@
 
         #region   |      Query     |
 
+        private static readonly Type ObjectType = typeof(object);//Dynamic İçin Eklendi
+        private static readonly Type ExpandoObjectType = typeof(ExpandoObject);
         private static readonly HashSet<Type> PrimitiveTypes = new HashSet<Type>()
         {
             CachedTypes.String,
@@ -74,13 +78,19 @@
             CachedTypes.Guid,CachedTypes.Int16,CachedTypes.Int32,CachedTypes.Int64, CachedTypes.UInt16, CachedTypes.UInt32, CachedTypes.UInt64, CachedTypes.SByte,
             CachedTypes.Nullable_Boolean, CachedTypes.Nullable_Byte, CachedTypes.Nullable_Char,CachedTypes.Nullable_DateTime, CachedTypes.Nullable_Single,
             CachedTypes.Nullable_Decimal,CachedTypes.Nullable_Double,CachedTypes.Nullable_Guid,CachedTypes.Nullable_Int16,CachedTypes.Nullable_Int32,CachedTypes.Nullable_Int64
-            ,CachedTypes.Nullable_UInt16, CachedTypes.Nullable_UInt32, CachedTypes.Nullable_UInt64, CachedTypes.Nullable_SByte
+            ,CachedTypes.Nullable_UInt16, CachedTypes.Nullable_UInt32, CachedTypes.Nullable_UInt64, CachedTypes.Nullable_SByte, ObjectType, ExpandoObjectType
         };
 
         public virtual TEntity QuerySingle<TEntity>(SqlQuery query)
         {
-            if (PrimitiveTypes.Contains(typeof (TEntity)))
+            Type elementType = typeof(TEntity);
+            if (PrimitiveTypes.Contains(elementType))
             {
+                if (elementType == ObjectType || elementType == ExpandoObjectType)
+                {
+                    dynamic d = this.factory.DataAccess.QuerySingle(query);
+                    return d;
+                }
                 return this.ConvertType
                     ? this.factory.DataAccess.ExecuteScalarSafely<TEntity>(query)
                     : this.factory.DataAccess.ExecuteScalar<TEntity>(query);
@@ -130,8 +140,25 @@
 
         public virtual IList<TEntity> Query<TEntity>(SqlQuery query)
         {
-            if (PrimitiveTypes.Contains(typeof(TEntity)))
+            Type elementType = typeof(TEntity);
+            if (PrimitiveTypes.Contains(elementType))
             {
+                if (elementType == ObjectType)
+                {
+                    var list = this.factory.DataAccess.Query(query);
+                    List<dynamic> ret = new List<dynamic>(list.Count);
+                    foreach (var item in list)
+                    {
+                        ret.Add(item);
+                    }
+                    return (dynamic)ret;
+                }
+                else if (elementType == ExpandoObjectType)
+                {
+                    var list = this.factory.DataAccess.Query(query);
+                    return (IList<TEntity>)list;
+                }
+
                 return this.factory.DataAccess.ExecuteScalarList<TEntity>(query);
             }
             else
