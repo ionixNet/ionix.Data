@@ -78,7 +78,8 @@
     <Compile Include="MetaData\Extensions.cs" />
     <Compile Include="MetaData\Interfaces.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repository\CachedRepository.cs" />
+    <Compile Include="Repository\CachedRepository\CachedRepository.IEnumerable.cs" />
+    <Compile Include="Repository\CachedRepository\CachedRepository.cs" />
     <Compile Include="Repository\IRepository.cs" />
     <Compile Include="Repository\Repository.cs" />
     <Compile Include="Repository\Repository.Events.cs" />

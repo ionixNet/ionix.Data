@@ -6,7 +6,8 @@
     using System.Linq.Expressions;
     using System.Collections.Generic;
 
-    public class CachedRepository<TEntity> : Repository<TEntity>
+    //it s a proxy.
+    public partial class CachedRepository<TEntity> : Repository<TEntity>
         where TEntity : class, new()
     {
         private readonly bool throwExceptionOnNonCachedOperation;
