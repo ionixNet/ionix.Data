@@ -3,6 +3,7 @@
     using Reflection;
     using System;
     using System.Collections;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Linq;
@@ -10,15 +11,25 @@
 
     public class IndexedEntityList<TEntity> : ICollection<TEntity>
     {
-        private readonly Dictionary<Key, TEntity> dic;
-        private readonly List<PropertyInfo> keys;
+        public static IndexedEntityList<TEntity> Create(params Expression<Func<TEntity, object>>[] keys)
+        {
+            return new IndexedEntityList<TEntity>(new Dictionary<Key, TEntity>(), keys);
+        }
 
-        public IndexedEntityList(params Expression<Func<TEntity, object>>[] keys)
+        public static IndexedEntityList<TEntity> CreateConcurrent(params Expression<Func<TEntity, object>>[] keys)
+        {
+            return new IndexedEntityList<TEntity>(new ConcurrentDictionary<Key, TEntity>(), keys);
+        }
+
+        private readonly IDictionary<Key, TEntity> dic;
+        private readonly ICollection<PropertyInfo> keys;
+
+        private IndexedEntityList(IDictionary<Key, TEntity> seed, params Expression<Func<TEntity, object>>[] keys)
         {
             if (!keys.Any())
                 throw new ArgumentNullException(nameof(keys));
 
-            this.dic = new Dictionary<Key, TEntity>();
+            this.dic = seed;
             this.keys = new List<PropertyInfo>(keys.Length);
             foreach (Expression<Func<TEntity, object>> exp in keys)
             {
@@ -26,17 +37,11 @@
             }
         }
 
-        public IndexedEntityList(IEnumerable<TEntity> list, params Expression<Func<TEntity, object>>[] keys)
-            : this(keys)
-        {
-            this.AddRange(list);
-        }
-
         private struct Key
         {
             private readonly List<object> keys;
 
-            public Key(List<PropertyInfo> keys, TEntity entity)
+            public Key(ICollection<PropertyInfo> keys, TEntity entity)
             {
                 this.keys = new List<object>(keys.Count);
                 foreach (PropertyInfo pi in keys)

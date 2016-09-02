@@ -37,7 +37,8 @@
                         if (null == this.list)
                         {
                             var allRecords = this.Cmd.Select<TEntity>();
-                            this.list = new IndexedEntityList<TEntity>(allRecords, this.keys);
+                            this.list = IndexedEntityList<TEntity>.CreateConcurrent(this.keys);
+                            this.list.AddRange(allRecords);
                         }
                     }
                 }
