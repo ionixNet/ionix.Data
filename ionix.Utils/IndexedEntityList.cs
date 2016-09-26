@@ -62,24 +62,24 @@
             public override int GetHashCode()
             {
                 int length = this.keys.Count;
-                //unchecked
-                //{
-                //    int hash = 17;
-                //    for (int j = 0; j < length; ++j)
-                //    {
-                //        hash = hash * 23 + this.keys[j].GetHashCode();
-                //    }
-                //    return hash;
-                //}
-                int hash = 0;
-                for (int j = 0; j < length; ++j)
+                unchecked
                 {
-                    object keyValue = this.keys[j];
-                    if (null == keyValue)
-                        throw new NullReferenceException("IndexedEntityList' s key value is null");
-                    hash ^= keyValue.GetHashCode();
+                    int hash = 17;
+                    for (int j = 0; j < length; ++j)
+                    {
+                        hash = hash * 23 + this.keys[j].GetHashCode();
+                    }
+                    return hash;
                 }
-                return hash;
+                //int hash = 0;
+                //for (int j = 0; j < length; ++j)
+                //{
+                //    object keyValue = this.keys[j];
+                //    if (null == keyValue)
+                //        throw new NullReferenceException("IndexedEntityList' s key value is null");
+                //    hash ^= keyValue.GetHashCode();
+                //}
+                //return hash;
             }
 
             public override bool Equals(object obj)
