@@ -103,19 +103,35 @@
             {
                 IList<T> list = en as IList<T>;
                 if (null != list)
-                    return (list.Count == 0 || (list.Count == 1 && list[0] == null));
+                    return list.Count == 0;
                 else
                 {
                     using (IEnumerator<T> enumerator = en.GetEnumerator())
                     {
-                        if (enumerator.MoveNext())
-                            return enumerator.Current == null;
-                        else
-                            return true;
+                        return !enumerator.MoveNext();
                     }
                 }
             }
             return true;
+
+            // return null == en || !en.Any();
+            //if (null != en)
+            //{
+            //    IList<T> list = en as IList<T>;
+            //    if (null != list)
+            //        return (list.Count == 0 || (list.Count == 1 && list[0] == null));
+            //    else
+            //    {
+            //        using (IEnumerator<T> enumerator = en.GetEnumerator())
+            //        {
+            //            if (enumerator.MoveNext())
+            //                return enumerator.Current == null;
+            //            else
+            //                return true;
+            //        }
+            //    }
+            //}
+            //return true;
         }
 
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> source)
