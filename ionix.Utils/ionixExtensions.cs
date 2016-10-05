@@ -101,7 +101,7 @@
         {
             if (null != en)
             {
-                IList<T> list = en as IList<T>;
+                ICollection<T> list = en as ICollection<T>;
                 if (null != list)
                     return list.Count == 0;
                 else
