@@ -15,6 +15,6 @@
             return this.GetEnumerator();
         }
 
-        public int RecordCount => this.List.Count;
+        public int Count => this.List.Count;
     }
 }
