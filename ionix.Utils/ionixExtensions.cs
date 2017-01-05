@@ -212,7 +212,13 @@
         public static IEnumerable<T> Paging<T>(this IEnumerable<T> input, int page, int pagesize)
         {
             if (input != null)
-                return input.Skip(page * pagesize).Take(pagesize);
+            {
+                int skip = page*pagesize;
+                if (skip < input.Count())
+                    return input.Skip(page*pagesize).Take(pagesize);
+                else
+                    return input.Take(pagesize);
+            }
             return new List<T>();
         }
 
