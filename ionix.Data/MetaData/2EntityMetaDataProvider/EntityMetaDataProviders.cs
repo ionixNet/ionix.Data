@@ -19,7 +19,7 @@
             if (pi.GetCustomAttribute<NotMappedAttribute>() != null)
                 return false;
 
-            if (ReflectionExtensions.IsEnumerable(pi))
+            if (ReflectionExtensions.IsEnumerable(pi.PropertyType))
                 return false;
 
             return true;

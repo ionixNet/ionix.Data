@@ -50,6 +50,7 @@
     <Compile Include="ReflectionExtensions.cs" />
     <Compile Include="SerializationExtensions.cs" />
     <Compile Include="SingleItemList.cs" />
+    <Compile Include="Singleton.cs" />
     <Compile Include="ThrowingHashSet.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

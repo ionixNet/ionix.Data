@@ -245,10 +245,14 @@
 
 
         private static readonly Type IEnumerableType = typeof(IEnumerable);
-        public static bool IsEnumerable(PropertyInfo pi)
+        //public static bool IsEnumerable(PropertyInfo pi)
+        //{
+        //    Type propertyType = pi.PropertyType;
+        //    return (IEnumerableType.IsAssignableFrom(propertyType) && (propertyType != CachedTypes.String && propertyType != CachedTypes.ByteArray));
+        //}
+        public static bool IsEnumerable(Type type)
         {
-            Type propertyType = pi.PropertyType;
-            return (IEnumerableType.IsAssignableFrom(propertyType) && (propertyType != CachedTypes.String && propertyType != CachedTypes.ByteArray));
+            return (IEnumerableType.IsAssignableFrom(type) && (type != CachedTypes.String && type != CachedTypes.ByteArray));
         }
 
         public static bool IsNullableType(this Type type)
