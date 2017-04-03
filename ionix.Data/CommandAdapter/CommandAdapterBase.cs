@@ -91,9 +91,7 @@ namespace ionix.Data
                     dynamic d = this.factory.DataAccess.QuerySingle(query);
                     return d;
                 }
-                return this.ConvertType
-                    ? this.factory.DataAccess.ExecuteScalarSafely<TEntity>(query)
-                    : this.factory.DataAccess.ExecuteScalar<TEntity>(query);
+                return this.factory.DataAccess.ExecuteScalar<TEntity>(query);
             }
             else
             {

@@ -136,32 +136,6 @@
             return ExecuteScalarAsync<T>(dataAccess, sql, null);
         }
 
-
-        public static Task<T> ExecuteScalarSafelyAsync<T>(this IDbAccess dataAccess, SqlQuery query)
-        {
-            return Task.Run<T>(() =>
-            {
-                if (null != dataAccess)
-                    return dataAccess.ExecuteScalarSafely<T>(query);
-                return default(T);
-            });
-        }
-        public static Task<T> ExecuteScalarSafelyAsync<T>(this IDbAccess dataAccess, string sql, params object[] pars)
-        {
-            return Task.Run<T>(() =>
-            {
-                if (null != dataAccess)
-                    return dataAccess.ExecuteScalarSafely<T>(sql, pars);
-                return default(T);
-            });
-        }
-        public static Task<T> ExecuteScalarSafelyAsync<T>(this IDbAccess dataAccess, string sql)
-        {
-            return ExecuteScalarSafelyAsync<T>(dataAccess, sql, null);
-        }
-
-
-
         public static Task<IEnumerable<T>> ExecuteScalarListAsync<T>(this IDbAccess dataAccess, SqlQuery query)
         {
             return Task.Run<IEnumerable<T>>(() =>

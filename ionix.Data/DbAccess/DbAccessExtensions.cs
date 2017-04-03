@@ -87,8 +87,16 @@
         {
             EnsureDbAccess(dataAccess);
 
-            return (T)Convert.ChangeType(dataAccess.ExecuteScalar(query), typeof(T));
+            try
+            {
+                return (T) Convert.ChangeType(dataAccess.ExecuteScalar(query), typeof(T));
+            }
+            catch
+            {
+                return default(T);
+            }
         }
+
         public static T ExecuteScalar<T>(this IDbAccess dataAccess, string sql, params object[] pars)
         {
             return ExecuteScalar<T>(dataAccess, sql.ToQuery(pars));
@@ -96,30 +104,6 @@
         public static T ExecuteScalar<T>(this IDbAccess dataAccess, string sql)
         {
             return ExecuteScalar<T>(dataAccess, sql, null);
-        }
-
-
-
-        public static T ExecuteScalarSafely<T>(this IDbAccess dataAccess, SqlQuery query)
-        {
-            if (null != dataAccess)
-            {
-                try
-                {
-                    return (T)Convert.ChangeType(dataAccess.ExecuteScalar(query), typeof(T));
-                }
-                catch { }
-            }
-
-            return default(T);
-        }
-        public static T ExecuteScalarSafely<T>(this IDbAccess dataAccess, string sql, params object[] pars)
-        {
-            return ExecuteScalarSafely<T>(dataAccess, sql.ToQuery(pars));
-        }
-        public static T ExecuteScalarSafely<T>(this IDbAccess dataAccess, string sql)
-        {
-            return ExecuteScalarSafely<T>(dataAccess, sql, null);
         }
 
 
@@ -134,7 +118,17 @@
                 {
                     object value = dr[0];
 
-                    ret.Add((T)Convert.ChangeType(value, typeof(T)));
+                    T item;
+                    try
+                    {
+                        item = (T)Convert.ChangeType(value, typeof(T));
+                    }
+                    catch
+                    {
+                        item = default(T);
+                    } 
+
+                    ret.Add(item);
                 }
             }
             return ret;
