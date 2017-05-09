@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ionix.Utils", "ionix.Utils\ionix.Utils.csproj", "{5BB35030-E8E1-4640-A6B2-314BC898206E}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ionix.Data.PostgreSql", "ionix.Data.PostgreSql\ionix.Data.PostgreSql.csproj", "{5E86F592-213F-4C89-975D-541455DB3E2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ionix.Data.SQLite", "ionix.Data.SQLite\ionix.Data.SQLite.csproj", "{28ED9D67-EEAF-4EAC-A986-0FEC4C6389FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ionix.Data.MongoDB", "ionix.Data.MongoDB\ionix.Data.MongoDB.csproj", "{970486EC-F81D-4305-87C0-E9F8416C9F4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{28ED9D67-EEAF-4EAC-A986-0FEC4C6389FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28ED9D67-EEAF-4EAC-A986-0FEC4C6389FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28ED9D67-EEAF-4EAC-A986-0FEC4C6389FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{970486EC-F81D-4305-87C0-E9F8416C9F4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{970486EC-F81D-4305-87C0-E9F8416C9F4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{970486EC-F81D-4305-87C0-E9F8416C9F4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{970486EC-F81D-4305-87C0-E9F8416C9F4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
