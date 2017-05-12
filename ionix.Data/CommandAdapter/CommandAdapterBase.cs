@@ -1,11 +1,10 @@
-﻿using System.Dynamic;
-
-namespace ionix.Data
+﻿namespace ionix.Data
 {
     using Utils;
     using Utils.Extensions;
     using System;
     using System.Collections.Generic;
+    using System.Dynamic;
 
 
     public abstract class CommandAdapterBase : ICommandAdapter
