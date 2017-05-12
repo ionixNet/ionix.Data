@@ -106,6 +106,9 @@
     //DbSchemaAttribute ile kullanılacak custom yapılar için.
     public class DbSchemaMetaDataProvider : EntityMetaDataProviderBase
     {
+        //this is not a singleton type but you can use this reference to avoid multiple unnecessary instance.
+        public static readonly DbSchemaMetaDataProvider Instance = new DbSchemaMetaDataProvider();
+
         protected override bool IsMapped(PropertyInfo pi)
         {
             if (pi.GetCustomAttribute<NotMappedAttribute>() != null)

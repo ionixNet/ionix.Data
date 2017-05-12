@@ -196,10 +196,10 @@ namespace ionixTests.Models
         [DbSchema(IsNullable = true, MaxLength = 25)]
 		public string TitleOfCourtesy { get; set; }
 
-        [DbSchema(IsNullable = true)]
+        [DbSchema(IsNullable = false)]
 		public DateTime? BirthDate { get; set; }
 
-        [DbSchema(IsNullable = true)]
+        [DbSchema(IsNullable = false)]
 		public DateTime? HireDate { get; set; }
 
         [DbSchema(IsNullable = true, MaxLength = 60)]

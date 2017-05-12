@@ -3,10 +3,12 @@
     using Utils;
     using Utils.Reflection;
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.IO;
     using System.Reflection;
     using System.Xml.Serialization;
+    using Utils.Extensions;
 
     public static class XmlExtension
     {
@@ -69,7 +71,7 @@
     {
         //SchemaInfo' ya göre validation. Zaten Typesafect bir ortamdayız. Sadece isnullable ve maxlength validation' ı.
         //Kullanıcı isteğe göre ekleyebilir.
-        public static bool IsEntityValid<TEntity>(TEntity entity, IEntityMetaDataProvider provider)
+        public static bool IsModelValid<TEntity>(TEntity entity, IEntityMetaDataProvider provider)
         {
             if (null != entity && null != provider)
             {
@@ -102,6 +104,30 @@
                 return true;
             }
             return false;
+        }
+
+        public static bool IsModelValid<TEntity>(TEntity entity)
+        {
+            return IsModelValid(entity, DbSchemaMetaDataProvider.Instance);
+        }
+
+        public static bool IsModelListValid<TEntity>(IEnumerable<TEntity> entityList, IEntityMetaDataProvider provider)
+        {
+            bool ret = !entityList.IsEmptyList();
+            if (ret)
+            {
+                foreach (var entity in entityList)
+                {
+                    ret = IsModelValid(entity, provider);
+                    if (!ret) return false;
+                }
+            }
+            return ret;
+        }
+
+        public static bool IsModelListValid<TEntity>(IEnumerable<TEntity> entityList)
+        {
+            return IsModelListValid(entityList, DbSchemaMetaDataProvider.Instance);
         }
     }
 }

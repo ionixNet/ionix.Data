@@ -32,5 +32,21 @@ namespace ionixTests
 
             Assert.IsNotNull(metaData);
         }
+
+        [TestMethod]
+        public void IsModelValid()
+        {
+            Employees e = new Employees();
+            e.LastName = "LastName";
+            e.FirstName = "FirstName";
+            e.BirthDate = DateTime.Now;
+            e.HireDate = DateTime.Now;
+            e.Title = Guid.NewGuid().ToString() + Guid.NewGuid().ToString() + Guid.NewGuid().ToString() +
+                      Guid.NewGuid().ToString() + Guid.NewGuid().ToString();
+
+            bool result = EntityMetadaExtensions.IsModelValid(e);
+
+            Assert.IsTrue(!result);
+        }
     }
 }
