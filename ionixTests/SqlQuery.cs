@@ -1,12 +1,11 @@
-﻿using System;//
-using System.Diagnostics;
-using ionix.Data;
-using ionix.Utils;
-using ionix.Utils.Serialization;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace ionixTests
+﻿namespace ionixTests
 {
+    using System;//
+    using System.Diagnostics;
+    using ionix.Data;
+    using ionix.Utils.Serialization;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class SqlQuerytTest
     {
