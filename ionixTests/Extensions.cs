@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ionix.Utils.Extensions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace ionixTests
+﻿namespace ionixTests
 {
+    using ionix.Utils.Extensions;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+
     [TestClass]
     public class ExtensionsTests
     {
