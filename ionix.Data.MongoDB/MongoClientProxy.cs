@@ -8,7 +8,7 @@
     using global::MongoDB.Driver.Core.Clusters;
     using Utils;
 
-    public sealed class MongoClientProxy: Singleton, IMongoClient
+    public sealed class MongoClientProxy : Singleton, IMongoClient
     {
         private static string ConnectionString = "mongodb://localhost:27017";
         public static void SetConnectionString(string value)
@@ -27,7 +27,7 @@
 
         private MongoClientProxy()
         {
-            
+
         }
 
         public void DropDatabase(string name, CancellationToken cancellationToken = new CancellationToken())
@@ -37,7 +37,7 @@
 
         public Task DropDatabaseAsync(string name, CancellationToken cancellationToken = new CancellationToken())
         {
-           return Concrete.DropDatabaseAsync(name, cancellationToken);
+            return Concrete.DropDatabaseAsync(name, cancellationToken);
         }
 
         public IMongoDatabase GetDatabase(string name, MongoDatabaseSettings settings = null)
@@ -47,7 +47,7 @@
 
         public IAsyncCursor<BsonDocument> ListDatabases(CancellationToken cancellationToken = new CancellationToken())
         {
-           return Concrete.ListDatabases(cancellationToken);
+            return Concrete.ListDatabases(cancellationToken);
         }
 
         public Task<IAsyncCursor<BsonDocument>> ListDatabasesAsync(CancellationToken cancellationToken = new CancellationToken())

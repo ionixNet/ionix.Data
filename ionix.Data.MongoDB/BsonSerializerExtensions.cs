@@ -12,7 +12,7 @@
 
         public static T BsonDeserialize<T>(this string bson)
         {
-           return BsonSerializer.Deserialize<T>(bson);
+            return BsonSerializer.Deserialize<T>(bson);
         }
     }
 }

@@ -274,5 +274,12 @@
             }
             return list;
         }
+
+
+        //added at 15.06.2017
+        public static HashSet<T> ToHashSet<T>(this List<T> list)
+        {
+            return new HashSet<T>(list);
+        }
     }
 }
