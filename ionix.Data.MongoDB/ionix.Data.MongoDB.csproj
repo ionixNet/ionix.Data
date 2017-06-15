@@ -47,10 +47,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Admin.cs" />
+    <Compile Include="MongoAdmin.cs" />
     <Compile Include="BsonSerializerExtensions.cs" />
     <Compile Include="Models\Database.cs" />
-    <Compile Include="Mongo.Cmd.cs" />
+    <Compile Include="Mongo.cs" />
     <Compile Include="MongoClientProxy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
