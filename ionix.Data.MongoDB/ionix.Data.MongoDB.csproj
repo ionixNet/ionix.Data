@@ -70,6 +70,10 @@
     <Compile Include="MongoClientProxy.cs" />
     <Compile Include="MongoRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Usages\Migration100.cs" />
+    <Compile Include="Usages\MongoDbContext.cs" />
+    <Compile Include="Usages\MongoHelper.cs" />
+    <Compile Include="Usages\ObjectIdListConverter.cs" />
     <Compile Include="Utils\AttributeExtensions.cs" />
     <Compile Include="Utils\HelperExtensions.cs" />
   </ItemGroup>
