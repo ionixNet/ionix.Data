@@ -92,8 +92,9 @@
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
-                if (this._lock != null)
-                    this._lock.Dispose();
+            {
+                this._lock?.Dispose();
+            }
         }
         ~ConcurrentHashSet()
         {
@@ -114,10 +115,7 @@
             }
         }
 
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         public IEnumerator<T> GetEnumerator()
         {

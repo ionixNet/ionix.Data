@@ -24,13 +24,15 @@
         {
             get
             {
-                lock (syncRoot)
+                if (!this.init)
                 {
-                    if (!this.init)
+                    lock (syncRoot)
                     {
-
-                        this.value = this.func();
-                        this.init = true;
+                        if (!this.init)
+                        {
+                            this.value = this.func();
+                            this.init = true;
+                        }
                     }
                 }
                 return this.value;
