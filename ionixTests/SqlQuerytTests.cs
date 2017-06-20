@@ -7,7 +7,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class SqlQuerytTest
+    public class SqlQuerytTests
     {
         [TestMethod]
         public void XmlTest()

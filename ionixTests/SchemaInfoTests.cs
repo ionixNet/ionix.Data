@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace ionixTests
 {
     [TestClass]
-    public class SchemaInfoTest
+    public class SchemaInfoTests
     {
         [TestMethod]
         public void XmlTest()

@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace ionixTests
 {
     [TestClass]
-    public class EntityMetaDataProviderTest
+    public class EntityMetaDataProviderTests
     {
         [TestMethod]
         public void CopyTest()
