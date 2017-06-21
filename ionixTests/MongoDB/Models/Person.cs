@@ -5,15 +5,16 @@
     using ionix.Data.MongoDB;
 
 
-    [MongoCollection(Database = "KASIRGA", Name = "Asset")]
-    [MongoIndex("Asset", Unique = true)]
+    [MongoCollection(Database = "TestDb", Name = "Person")]
+    [MongoIndex("Name", Unique = true)]
+    [MongoTextIndex("*")]
     //[BsonIgnoreExtraElements]
-    public class MngAsset
+    public class Person
     {
         [BsonId]
         public ObjectId Id { get; set; }
 
-        public string Asset { get; set; }
+        public string Name { get; set; }
 
         public bool Active { get; set; } = true;
 

@@ -79,9 +79,10 @@
       <DependentUpon>Entities.tt</DependentUpon>
     </Compile>
     <Compile Include="EntityMetaDataProviderTests.cs" />
+    <Compile Include="MongoDB\Migration100.cs" />
     <Compile Include="MongoDB\Models\LdapUser.cs" />
-    <Compile Include="MongoDB\Models\MngAsset.cs" />
-    <Compile Include="MongoDB\Models\MngAssetTag.cs" />
+    <Compile Include="MongoDB\Models\Person.cs" />
+    <Compile Include="MongoDB\Models\PersonAddress.cs" />
     <Compile Include="MongoDB\MongoDbPerformanceTests.cs" />
     <Compile Include="MongoDB\MongoTests.cs" />
     <Compile Include="SqlQuerytTests.cs" />

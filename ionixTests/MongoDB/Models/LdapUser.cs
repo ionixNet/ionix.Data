@@ -4,9 +4,9 @@
     using global::MongoDB.Bson.Serialization.Attributes;
     using ionix.Data.MongoDB;
 
-    [MongoCollection(Database = "KASIRGA", Name = "TextIndexModel")]
+    [MongoCollection(Database = "TestDb", Name = "LdapUser")]
     [MongoIndex("UserName", Unique = true)]
-    [MongoTextIndex("DisplayName", "PhysicalDeliveryOfficeName")]
+    [MongoTextIndex("DisplayName", "physicalDeliveryOfficeName")]
     public class LdapUser
     {
         [BsonId]

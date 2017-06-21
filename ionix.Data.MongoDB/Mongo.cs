@@ -6,7 +6,6 @@
     using System.Linq.Expressions;
     using System.Threading.Tasks;
     using System.Reflection;
-    using System.Threading;
     using global::MongoDB.Bson;
     using global::MongoDB.Bson.Serialization.Attributes;
     using global::MongoDB.Driver;
@@ -311,38 +310,28 @@
         #endregion
 
 
-        #region   |   BulkWrite   |
+        #region   |   BulkReplace  |
 
-        //public Task<BulkWriteResult<TEntity>> BulkReplaceAsync<TEntity>(Func<TEntity, Expression<Func<TEntity, bool>>> filter, IEnumerable<TEntity> list, CancellationToken ct = default(CancellationToken))
-        //{
-        //    List<ReplaceOneModel<TEntity>> operations = new List<ReplaceOneModel<TEntity>>();
-        //    foreach (var mng in list)
-        //    {
-        //        Expression<Func<TEntity, bool>> exp = filter(mng);
-        //        operations.Add(new ReplaceOneModel<TEntity>(exp, mng));
-        //    }
-        //    return this.Get<TEntity>().BulkWriteAsync(operations, ct);
-        //}
 
-        public Task<BulkWriteResult<TEntity>> BulkReplaceAsync<TEntity>(IEnumerable<TEntity> list, BulkWriteOptions options, bool isUpsert, params Expression<Func<TEntity, object>>[] fields)
+        public Task<BulkWriteResult<TEntity>> BulkReplaceAsync<TEntity>(IEnumerable<TEntity> list, BulkWriteOptions options, bool isUpsert, params Expression<Func<TEntity, object>>[] filterFields)
         {
-            if (fields.IsEmptyList())
-                throw new ArgumentException(nameof(fields) + " can not be null or empty.");
+            if (filterFields.IsEmptyList())
+                throw new ArgumentException(nameof(filterFields) + " can not be null or empty.");
 
-            var properties = fields.Select(ReflectionExtensions.GetPropertyInfo).ToList();
-            List<ReplaceOneModel<TEntity>> requests = new List<ReplaceOneModel<TEntity>>();
-            foreach (var mng in list)
+            var properties = filterFields.Select(ReflectionExtensions.GetPropertyInfo).ToList();
+            List<WriteModel<TEntity>> requests = new List<WriteModel<TEntity>>();
+            foreach (var entity in list)
             {
                 var dic = new Dictionary<string, object>();
                 foreach (PropertyInfo pi in properties)
                 {
-                    dic[pi.Name] = pi.GetValue(mng);
+                    dic[pi.Name] = pi.GetValue(entity);
                 }
                 BsonDocument bd = new BsonDocument(dic);
 
                 FilterDefinition<TEntity> fd = bd;
-;
-                requests.Add(new ReplaceOneModel<TEntity>(fd, mng) { IsUpsert = isUpsert });
+
+                requests.Add(new ReplaceOneModel<TEntity>(fd, entity) { IsUpsert = isUpsert });
             }
             return this.Get<TEntity>().BulkWriteAsync(requests, options);
         }
@@ -355,19 +344,122 @@
             if (null == pi)
                 throw new InvalidOperationException($"{typeof(TEntity).Name} has no BsonId field");
 
-            List<ReplaceOneModel<TEntity>> requests = new List<ReplaceOneModel<TEntity>>();
-            foreach (var mng in list)
+            List<WriteModel<TEntity>> requests = new List<WriteModel<TEntity>>();
+            foreach (var entity in list)
             {
                 var dic = new Dictionary<string, object>();
-                dic["_id"] = pi.GetValue(mng);
+                dic["_id"] = pi.GetValue(entity);
 
                 BsonDocument bd = new BsonDocument(dic);
 
                 FilterDefinition<TEntity> fd = bd;
                 ;
-                requests.Add(new ReplaceOneModel<TEntity>(fd, mng) { IsUpsert = isUpsert });
+                requests.Add(new ReplaceOneModel<TEntity>(fd, entity) { IsUpsert = isUpsert });
             }
             return this.Get<TEntity>().BulkWriteAsync(requests, options);
+        }
+
+        #endregion
+
+
+        #region   |   BulkUpdate  |
+
+        //Filter id den alacak.
+        public Task<BulkWriteResult<TEntity>> BulkUpdateAsync<TEntity>(IEnumerable<TEntity> list,
+            BulkWriteOptions options, params Expression<Func<TEntity, object>>[] updateFields)
+        {
+            var idPi = typeof(TEntity).GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .FirstOrDefault(p => p.GetCustomAttribute<BsonIdAttribute>() != null);
+            if (null == idPi)
+                throw new InvalidOperationException($"{typeof(TEntity).Name} has no BsonId field");
+
+            var properties = updateFields.Select(ReflectionExtensions.GetPropertyInfo).ToList();
+
+            List<WriteModel<TEntity>> requests = new List<WriteModel<TEntity>>();
+            foreach (var entity in list)
+            {
+                var dic = new Dictionary<string, object>();
+                dic["_id"] = idPi.GetValue(entity);
+
+                BsonDocument filterBd = new BsonDocument(dic);
+
+                FilterDefinition<TEntity> fd = filterBd;
+
+                dic.Clear();
+                foreach (var pi in properties)
+                {
+                    dic[pi.Name] = pi.GetValue(entity);
+                }
+
+                var update = new BsonDocument("$set", new BsonDocument(dic));
+
+                requests.Add(new UpdateOneModel<TEntity>(fd, update));
+            }
+            return this.Get<TEntity>().BulkWriteAsync(requests, options);
+        }
+
+        #endregion
+
+
+        #region   |   BulkDelete   |
+
+        public Task<BulkWriteResult<TEntity>> BulkDeleteAsync<TEntity>(IEnumerable<TEntity> list, BulkWriteOptions options, params Expression<Func<TEntity, object>>[] filterFields)
+        {
+            if (filterFields.IsEmptyList())
+                throw new ArgumentException(nameof(filterFields) + " can not be null or empty.");
+
+            var properties = filterFields.Select(ReflectionExtensions.GetPropertyInfo).ToList();
+            List<WriteModel<TEntity>> requests = new List<WriteModel<TEntity>>();
+            foreach (var entity in list)
+            {
+                var dic = new Dictionary<string, object>();
+                foreach (PropertyInfo pi in properties)
+                {
+                    dic[pi.Name] = pi.GetValue(entity);
+                }
+                BsonDocument bd = new BsonDocument(dic);
+
+                FilterDefinition<TEntity> fd = bd;
+
+                requests.Add(new DeleteOneModel<TEntity>(fd));
+            }
+            return this.Get<TEntity>().BulkWriteAsync(requests, options);
+        }
+
+        public Task<BulkWriteResult<TEntity>> BulkDeleteAsync<TEntity>(IEnumerable<TEntity> list,
+            BulkWriteOptions options)
+        {
+            var idPi = typeof(TEntity).GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .FirstOrDefault(p => p.GetCustomAttribute<BsonIdAttribute>() != null);
+
+            List<WriteModel<TEntity>> requests = new List<WriteModel<TEntity>>();
+            foreach (var entity in list)
+            {
+                var dic = new Dictionary<string, object>();
+                dic["_id"] = idPi.GetValue(entity);
+                BsonDocument bd = new BsonDocument(dic);
+
+                FilterDefinition<TEntity> fd = bd;
+
+                requests.Add(new DeleteOneModel<TEntity>(fd));
+            }
+            return this.Get<TEntity>().BulkWriteAsync(requests, options);
+        }
+
+        #endregion
+
+
+        #region   |   Search   |
+
+        public IEnumerable<TEntity> TextSearch<TEntity>(string text)
+        {
+            return this.Get<TEntity>().Find(Builders<TEntity>.Filter.Text(text)).ToList();
+        }
+
+        public async Task<IEnumerable<TEntity>> TextSearchAsync<TEntity>(string text)
+        {
+            var result = await this.Get<TEntity>().FindAsync(Builders<TEntity>.Filter.Text(text));
+            return await result.ToListAsync();
         }
 
         #endregion

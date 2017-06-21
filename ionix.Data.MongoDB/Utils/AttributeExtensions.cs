@@ -122,8 +122,15 @@
                         sb.Append("db.")
                             .Append(GetCollectionName(owner))
                             .Append(".createIndex( { ");
-                        foreach (var field in attr.Fields)
+                        foreach (var fieldOrginal in attr.Fields)
                         {
+                            var field = fieldOrginal;
+                            if (field == "*")
+                            {
+                                field = "'$**'";
+                                name = "txtIndex_All";
+                            }
+
                             sb.Append(field)
                                 .Append(": 'text', ");
                         }

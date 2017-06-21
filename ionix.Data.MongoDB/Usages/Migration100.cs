@@ -5,7 +5,7 @@
 
 //    public class Migration100 : Migration.Migration
 //    {
-//        public const string DatabaseName = "KASIRGA";
+//        public const string DatabaseName = "TestDb";
 
 //        public Migration100()
 //            : base("1.0.0")

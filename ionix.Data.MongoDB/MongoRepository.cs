@@ -188,5 +188,66 @@
         }
 
         #endregion
+
+
+
+        #region   |   BulkReplace  |
+
+        public Task<BulkWriteResult<TEntity>> BulkReplaceAsync(IEnumerable<TEntity> list, BulkWriteOptions options, bool isUpsert, params Expression<Func<TEntity, object>>[] filterFields)
+        {
+            return this.mongo.BulkReplaceAsync(list, options, isUpsert, filterFields);
+        }
+
+        public Task<BulkWriteResult<TEntity>> BulkReplaceAsync(IEnumerable<TEntity> list,
+            BulkWriteOptions options, bool isUpsert)
+        {
+            return this.mongo.BulkReplaceAsync(list, options, isUpsert);
+        }
+
+        #endregion
+
+
+        #region   |   BulkUpdate  |
+
+        //Filter id den alacak.
+        public Task<BulkWriteResult<TEntity>> BulkUpdateAsync(IEnumerable<TEntity> list,
+            BulkWriteOptions options, params Expression<Func<TEntity, object>>[] updateFields)
+        {
+            return this.mongo.BulkUpdateAsync(list, options, updateFields);
+        }
+
+        #endregion
+
+
+        #region   |   BulkDelete   |
+
+        public Task<BulkWriteResult<TEntity>> BulkDeleteAsync(IEnumerable<TEntity> list, BulkWriteOptions options, params Expression<Func<TEntity, object>>[] filterFields)
+        {
+            return this.mongo.BulkDeleteAsync(list, options, filterFields);
+        }
+
+        public Task<BulkWriteResult<TEntity>> BulkDeleteAsync(IEnumerable<TEntity> list,
+            BulkWriteOptions options)
+        {
+            return this.mongo.BulkDeleteAsync(list, options);
+        }
+
+        #endregion
+
+
+
+        #region   |   Search   |
+
+        public IEnumerable<TEntity> TextSearch(string text)
+        {
+            return this.mongo.TextSearch<TEntity>(text);
+        }
+
+        public Task<IEnumerable<TEntity>> TextSearchAsync(string text)
+        {
+            return this.mongo.TextSearchAsync<TEntity>(text);
+        }
+
+        #endregion
     }
 }
