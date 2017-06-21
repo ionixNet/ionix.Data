@@ -24,8 +24,7 @@
             MongoClientProxy.SetConnectionString(MongoAddress);
         }
 
-        static int Limit = 1000;// 100000;
-        private static Task InsertMany<TEntity>()
+        private static IEnumerable<TEntity> CreateMockData<TEntity>(int limit)
             where TEntity : new()
         {
             var properties = typeof(TEntity).GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -43,8 +42,8 @@
             dic.Add(typeof(UInt16), (en, pi) => pi.SetValue(en, (UInt16)rnd.Next(10, UInt16.MaxValue)));
             dic.Add(typeof(byte), (en, pi) => pi.SetValue(en, (byte)rnd.Next(10, byte.MaxValue)));
 
-            List<TEntity> list = new List<TEntity>(Limit);
-            for (int j = 0; j < Limit; ++j)
+            List<TEntity> list = new List<TEntity>(limit);
+            for (int j = 0; j < limit; ++j)
             {
                 TEntity en = new TEntity();
                 foreach (var pi in properties)
@@ -58,13 +57,17 @@
                 list.Add(en);
             }
 
-            return MongoRepository<TEntity>.Create().InsertManyAsync(list);
+            return list;
+        }
+        private static Task InsertMany<TEntity>()
+            where TEntity : new()
+        {
+            return new MongoRepository<TEntity>().InsertManyAsync(CreateMockData<TEntity>(100));
         }
         private static void InsertAssetTag()
         {
-            int limit = Limit / 100;
             Stopwatch bench = Stopwatch.StartNew();
-            var assetList = Mongo.Cmd.AsQueryable<MngAsset>().Take(limit).ToList();
+            var assetList = Mongo.Cmd.AsQueryable<MngAsset>().ToList();
 
            // Random rnd = new Random();
 
@@ -89,10 +92,10 @@
             }
 
             bench.Stop();
-            Console.WriteLine($"{typeof(MngAssetTag).Name}, Limit: {limit * 3}, Elepsad: {bench.ElapsedTicks}");
+            Console.WriteLine($"{typeof(MngAssetTag).Name}, Elepsad: {bench.ElapsedTicks}");
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void InitializeMock()
         {
          //   var db = MongoAdmin.GetDatabase(MongoClientProxy.Instance, "KASIRGA");
@@ -392,6 +395,35 @@
             }
 
             Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public async Task BulkReplaceAsyncTest()
+        {
+            var list = await Mongo.Cmd.AsQueryable<MngAsset>().OrderBy(p => p.Id).Take(10).ToListAsync();
+
+
+            list.ForEach(i => i.Asset = "Changed By Mehmet " + Guid.NewGuid().ToString("N"));
+
+            var result = await Mongo.Cmd.BulkReplaceAsync(list, null, false, p => p.Asset);
+
+            list.ForEach(i => i.Description = "Changed By Mehmet 2");
+
+            result = await Mongo.Cmd.BulkReplaceAsync(list, null, false);
+
+            list.ForEach(i =>
+            {
+                i.Id = ObjectId.GenerateNewId();
+                i.Asset = Guid.NewGuid().ToString("N");
+            });
+
+            result = await Mongo.Cmd.BulkReplaceAsync(list, null, true, p => p.Asset);
+
+            list.ForEach(i => i.Id = ObjectId.GenerateNewId());
+
+            result = await Mongo.Cmd.BulkReplaceAsync(list, null, true);
+
+            Assert.IsNotNull(result);
         }
     }
 }
