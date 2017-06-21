@@ -10,38 +10,45 @@
     //a kind of proxy
     public class MongoRepository<TEntity>
     {
-        public static MongoRepository<TEntity> Create()
+        private readonly Mongo mongo;
+        public MongoRepository(IMongoClient client)
         {
-            return new MongoRepository<TEntity>();
+            this.mongo = new Mongo(client);
         }
 
-        public IMongoCollection<TEntity> Collection => Mongo.Cmd.Get<TEntity>();
+        public MongoRepository()
+            : this(MongoClientProxy.Instance)
+        {
+            
+        }
+
+        public IMongoCollection<TEntity> Collection => this.mongo.Get<TEntity>();
 
         #region |   Select   |
 
         public long Count()
         {
-            return Mongo.Cmd.Count<TEntity>();
+            return this.mongo.Count<TEntity>();
         }
 
         public Task<long> CountAsync()
         {
-            return Mongo.Cmd.CountAsync<TEntity>();
+            return this.mongo.CountAsync<TEntity>();
         }
 
         public IMongoQueryable<TEntity> AsQueryable()
         {
-            return Mongo.Cmd.AsQueryable<TEntity>();
+            return this.mongo.AsQueryable<TEntity>();
         }
 
         public TEntity GetById(object id)
         {
-            return Mongo.Cmd.GetById<TEntity>(id);
+            return this.mongo.GetById<TEntity>(id);
         }
 
         public Task<TEntity> GetByIdAsync(object id)
         {
-            return Mongo.Cmd.GetByIdAsync<TEntity>(id);
+            return this.mongo.GetByIdAsync<TEntity>(id);
         }
 
         #endregion
@@ -51,22 +58,22 @@
 
         public void InsertOne(TEntity entity, InsertOneOptions options = null)
         {
-            Mongo.Cmd.InsertOne(entity, options);
+            this.mongo.InsertOne(entity, options);
         }
 
         public Task InsertOneAsync(TEntity entity, InsertOneOptions options = null)
         {
-            return Mongo.Cmd.InsertOneAsync(entity, options);
+            return this.mongo.InsertOneAsync(entity, options);
         }
 
         public void InsertMany(IEnumerable<TEntity> entityList, InsertManyOptions options = null)
         {
-            Mongo.Cmd.InsertMany(entityList, options);
+            this.mongo.InsertMany(entityList, options);
         }
 
         public Task InsertManyAsync(IEnumerable<TEntity> entityList, InsertManyOptions options = null)
         {
-            return Mongo.Cmd.InsertManyAsync(entityList, options);
+            return this.mongo.InsertManyAsync(entityList, options);
         }
 
         #endregion
@@ -76,22 +83,22 @@
 
         public ReplaceOneResult ReplaceOne(Expression<Func<TEntity, bool>> predicate, TEntity entity, UpdateOptions options = null)
         {
-            return Mongo.Cmd.ReplaceOne(predicate, entity, options);
+            return this.mongo.ReplaceOne(predicate, entity, options);
         }
         //id value must be set.
         public ReplaceOneResult ReplaceOne(TEntity entity, UpdateOptions options = null)
         {
-            return Mongo.Cmd.ReplaceOne(entity, options);
+            return this.mongo.ReplaceOne(entity, options);
         }
 
         //waring: _id values in MongoDB documents are immutable. If you specify an _id in the replacement document, it must match the _id of the existing document.
         public Task<ReplaceOneResult> ReplaceOneAsync(Expression<Func<TEntity, bool>> predicate, TEntity entity, UpdateOptions options = null)
         {
-            return Mongo.Cmd.ReplaceOneAsync(predicate, entity, options);
+            return this.mongo.ReplaceOneAsync(predicate, entity, options);
         }
         public Task<ReplaceOneResult> ReplaceOneAsync(TEntity entity, UpdateOptions options = null)
         {
-            return Mongo.Cmd.ReplaceOneAsync(entity, options);
+            return this.mongo.ReplaceOneAsync(entity, options);
         }
 
         #endregion
@@ -101,34 +108,34 @@
             Func<UpdateDefinitionBuilder<TEntity>, UpdateDefinition<TEntity>> sets,
             UpdateOptions options = null)
         {
-            return Mongo.Cmd.UpdateOne(filter, sets, options);
+            return this.mongo.UpdateOne(filter, sets, options);
         }
 
         public UpdateResult UpdateOne(object id,
             Func<UpdateDefinitionBuilder<TEntity>, UpdateDefinition<TEntity>> sets,
             UpdateOptions options = null)
         {
-            return Mongo.Cmd.UpdateOne(id, sets, options);
+            return this.mongo.UpdateOne(id, sets, options);
         }
 
         public UpdateResult UpdateOne(TEntity entity
             , params Expression<Func<TEntity, object>>[] fields)
         {
-            return Mongo.Cmd.UpdateOne(entity, fields);
+            return this.mongo.UpdateOne(entity, fields);
         }
 
         public Task<UpdateResult> UpdateOneAsync(Expression<Func<TEntity, bool>> predicate,
             Func<UpdateDefinitionBuilder<TEntity>, UpdateDefinition<TEntity>> sets,
             UpdateOptions options = null)
         {
-            return Mongo.Cmd.UpdateOneAsync(predicate, sets, options);
+            return this.mongo.UpdateOneAsync(predicate, sets, options);
         }
 
         public Task<UpdateResult> UpdateOneAsync(object id,
             Func<UpdateDefinitionBuilder<TEntity>, UpdateDefinition<TEntity>> sets,
             UpdateOptions options = null)
         {
-            return Mongo.Cmd.UpdateOneAsync(id, sets, options);
+            return this.mongo.UpdateOneAsync(id, sets, options);
         }
 
 
@@ -136,14 +143,14 @@
             Func<UpdateDefinitionBuilder<TEntity>, UpdateDefinition<TEntity>> sets,
             UpdateOptions options = null)
         {
-            return Mongo.Cmd.UpdateMany(filter, sets, options);
+            return this.mongo.UpdateMany(filter, sets, options);
         }
 
         public Task<UpdateResult> UpdateManyAsync(Expression<Func<TEntity, bool>> filter,
             Func<UpdateDefinitionBuilder<TEntity>, UpdateDefinition<TEntity>> sets,
             UpdateOptions options = null)
         {
-            return Mongo.Cmd.UpdateManyAsync(filter, sets, options);
+            return this.mongo.UpdateManyAsync(filter, sets, options);
         }
 
         #endregion
@@ -152,32 +159,32 @@
 
         public DeleteResult DeleteOne(Expression<Func<TEntity, bool>> filter, DeleteOptions options = null)
         {
-            return Mongo.Cmd.DeleteOne(filter, options);
+            return this.mongo.DeleteOne(filter, options);
         }
 
         public DeleteResult DeleteOne(object id, DeleteOptions options = null)
         {
-            return Mongo.Cmd.DeleteOne<TEntity>(id, options);
+            return this.mongo.DeleteOne<TEntity>(id, options);
         }
 
         public Task<DeleteResult> DeleteOneAsync(Expression<Func<TEntity, bool>> filter, DeleteOptions options = null)
         {
-            return Mongo.Cmd.DeleteOneAsync(filter, options);
+            return this.mongo.DeleteOneAsync(filter, options);
         }
 
         public Task<DeleteResult> DeleteOneAsync(object id, DeleteOptions options = null)
         {
-            return Mongo.Cmd.DeleteOneAsync<TEntity>(id, options);
+            return this.mongo.DeleteOneAsync<TEntity>(id, options);
         }
 
 
         public DeleteResult DeleteMany(Expression<Func<TEntity, bool>> filter, DeleteOptions options = null)
         {
-            return Mongo.Cmd.DeleteMany(filter, options);
+            return this.mongo.DeleteMany(filter, options);
         }
         public Task<DeleteResult> DeleteManyAsync(Expression<Func<TEntity, bool>> filter, DeleteOptions options = null)
         {
-            return Mongo.Cmd.DeleteManyAsync(filter, options);
+            return this.mongo.DeleteManyAsync(filter, options);
         }
 
         #endregion

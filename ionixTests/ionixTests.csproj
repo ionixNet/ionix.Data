@@ -36,10 +36,26 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\..\..\3rd\MongoDB\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\..\..\3rd\MongoDB\MongoDB.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core">
+      <HintPath>..\..\..\3rd\MongoDB\MongoDB.Driver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\3rd\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
+      <HintPath>..\..\..\3rd\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
     <Reference Include="System.XML" />
   </ItemGroup>
   <Choose>
@@ -63,6 +79,11 @@
       <DependentUpon>Entities.tt</DependentUpon>
     </Compile>
     <Compile Include="EntityMetaDataProviderTests.cs" />
+    <Compile Include="MongoDB\Models\LdapUser.cs" />
+    <Compile Include="MongoDB\Models\MngAsset.cs" />
+    <Compile Include="MongoDB\Models\MngAssetTag.cs" />
+    <Compile Include="MongoDB\MongoDbPerformanceTests.cs" />
+    <Compile Include="MongoDB\MongoTests.cs" />
     <Compile Include="SqlQuerytTests.cs" />
     <Compile Include="SchemaInfoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,6 +91,10 @@
     <Compile Include="SqlServer\DbClient.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ionix.Data.MongoDB\ionix.Data.MongoDB.csproj">
+      <Project>{970486ec-f81d-4305-87c0-e9f8416c9f4d}</Project>
+      <Name>ionix.Data.MongoDB</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ionix.Data.SqlServer\ionix.Data.SqlServer.csproj">
       <Project>{548c5092-afb3-4f82-a3bd-f75f28245b54}</Project>
       <Name>ionix.Data.SqlServer</Name>
@@ -83,9 +108,7 @@
       <Name>ionix.Utils</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MongoDB\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Models\EF.Reverse.POCO.Core.ttinclude" />

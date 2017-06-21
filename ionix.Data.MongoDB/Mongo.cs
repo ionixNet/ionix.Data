@@ -16,12 +16,25 @@
     {
         public static readonly Mongo Cmd = new Mongo();
 
-        private Mongo() { }
+        private readonly IMongoClient client;
+        public Mongo(IMongoClient client)
+        {
+            if (null == client)
+                throw new ArgumentNullException(nameof(client));
+
+            this.client = client;
+        }
+
+        public Mongo()
+            : this(MongoClientProxy.Instance)
+        {
+            
+        }
 
 
         public IMongoCollection<TEntity> Get<TEntity>()
         {
-            return MongoAdmin.GetCollection<TEntity>();
+            return MongoAdmin.GetCollection<TEntity>(this.client);
         }
 
         #region |   Select   |
