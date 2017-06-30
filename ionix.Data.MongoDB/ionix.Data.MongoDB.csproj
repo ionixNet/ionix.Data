@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Serializer\DictionarySerializer.cs" />
     <Compile Include="Usages\MigrationBase.cs" />
     <Compile Include="Atributes\MongoCollectionAttribute.cs" />
     <Compile Include="Atributes\MongoIndexAttribute.cs" />
@@ -65,7 +66,7 @@
     <Compile Include="Migration\MigrationVersion.cs" />
     <Compile Include="Migration\MigrationVersionSerializer.cs" />
     <Compile Include="MongoAdmin.cs" />
-    <Compile Include="BsonSerializerExtensions.cs" />
+    <Compile Include="Serializer\BsonSerializerExtensions.cs" />
     <Compile Include="Models\Database.cs" />
     <Compile Include="Mongo.cs" />
     <Compile Include="MongoClientProxy.cs" />
@@ -86,6 +87,7 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -9,6 +9,7 @@
     using System.Linq;
     using System.Reflection;
     using global::MongoDB.Bson;
+    using global::MongoDB.Bson.Serialization;
     using global::MongoDB.Bson.Serialization.Attributes;
     using global::MongoDB.Driver;
     using global::MongoDB.Driver.Linq;
@@ -493,6 +494,95 @@
             list = await  Cmd.TextSearchAsync<LdapUser>("bayburt");
 
             Assert.IsNotNull(list);
+        }
+
+        [TestMethod]
+        public void LookupTest()
+        {
+            var script = @"db.PersonAddress.aggregate([
+            {$match: { Active: { $eq: true }, _id:{$ne: ObjectId('59563835645e2f41587c3204')} }},
+            {$limit: 1500},
+            {$sort: { _id: 1} },
+  
+            {
+                $lookup:
+                {
+                    from: 'Person',
+                    localField: 'PersonId',
+                    foreignField: '_id',
+                        as: 'Person'
+                }
+            },
+            {
+                $unwind: '$Person'
+            },
+  
+            {
+                $lookup:
+                {
+                    from: 'Address',
+                    localField: 'AddressId',
+                    foreignField: '_id',
+                        as: 'Address'
+                }
+            },
+            {
+                $unwind: '$Address'
+            },
+  
+            {
+                $project:
+                {
+                    _id: 1,  
+                    PersonId: 1,
+                    AddressId: 1,
+                    Active: 1,
+        
+                    Person:
+                    {
+                        _id: 1,
+                        Name: 1,
+                        Active: 1,
+                        Description: 1
+                    },
+      
+                    Address:
+                    {
+                        _id: 1,
+                        Name: 1,
+                        Country: 1,
+                        City: 1,
+                        PostalCode: 1,
+                        Street: 1,
+                        HouseNumber: 1
+                    }
+                }
+            }
+            ]); ";
+
+
+            var x = Cmd.AsQueryable<Person>().FirstOrDefault();
+            var y = DictionarySerializer.Serialize(x);
+
+            var dic = MongoAdmin.ExecuteScript(MongoAdmin.GetDatabase(MongoClientProxy.Instance
+                , DbContext.DatabaseName), script).ToDictionary();
+
+            object[] arr = ((IDictionary<string, object>) dic.First().Value).First().Value as object[];
+
+            foreach (var dicItem in arr)
+            {
+                var myDic = dicItem as IDictionary<string, object>;
+
+                PersonAddress model = DictionarySerializer.Deserialize<PersonAddress>(myDic);
+
+                var personDic = myDic["Person"] as IDictionary<string, object>;
+                var person = DictionarySerializer.Deserialize<Person>(personDic);
+
+                var addressDic = myDic["Address"] as IDictionary<string, object>;
+                var adress = DictionarySerializer.Deserialize<Address>(addressDic);
+            }
+            
+            Assert.Fail();
         }
     }
 }

@@ -236,20 +236,16 @@
         }
 
         private static readonly HashSet<Type> primitiveTypes = new HashSet<Type>() { CachedTypes.String, CachedTypes.Decimal, CachedTypes.DateTime, CachedTypes.ByteArray, CachedTypes.Guid };
-        public static bool IsPrimitiveType(PropertyInfo pi)
+
+        public static bool IsPrimitiveType(Type type)
         {
-            Type propertyType = pi.PropertyType;
-            return propertyType.IsPrimitive || primitiveTypes.Contains(propertyType)
-                   || (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == CachedTypes.PureNullableType);
+            return type.IsPrimitive || primitiveTypes.Contains(type)
+                || IsNullableType(type);
+                 //  || (type.IsGenericType && type.GetGenericTypeDefinition() == CachedTypes.PureNullableType);
         }
 
 
         private static readonly Type IEnumerableType = typeof(IEnumerable);
-        //public static bool IsEnumerable(PropertyInfo pi)
-        //{
-        //    Type propertyType = pi.PropertyType;
-        //    return (IEnumerableType.IsAssignableFrom(propertyType) && (propertyType != CachedTypes.String && propertyType != CachedTypes.ByteArray));
-        //}
         public static bool IsEnumerable(Type type)
         {
             return (IEnumerableType.IsAssignableFrom(type) && (type != CachedTypes.String && type != CachedTypes.ByteArray));

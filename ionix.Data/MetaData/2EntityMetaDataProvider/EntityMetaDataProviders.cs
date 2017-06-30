@@ -19,8 +19,12 @@
             if (pi.GetCustomAttribute<NotMappedAttribute>() != null)
                 return false;
 
+            //if (!ReflectionExtensions.IsPrimitiveType(pi.PropertyType))
+            //    return false;
+
             if (ReflectionExtensions.IsEnumerable(pi.PropertyType))
                 return false;
+
 
             return true;
         }
@@ -143,7 +147,7 @@
         {
             if (base.IsMapped(pi))
             {
-                return ReflectionExtensions.IsPrimitiveType(pi);
+                return ReflectionExtensions.IsPrimitiveType(pi.PropertyType);
             }
 
             return false;
