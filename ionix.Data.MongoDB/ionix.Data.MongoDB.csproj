@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Usages\MigrationBase.cs" />
     <Compile Include="Atributes\MongoCollectionAttribute.cs" />
     <Compile Include="Atributes\MongoIndexAttribute.cs" />
     <Compile Include="Atributes\MongoTextIndexAttribute.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Usages\Migration100.cs" />
     <Compile Include="Usages\MongoDbContext.cs" />
     <Compile Include="Usages\MongoHelper.cs" />
+    <Compile Include="Usages\ObjectIdConverter.cs" />
     <Compile Include="Usages\ObjectIdListConverter.cs" />
     <Compile Include="Utils\AttributeExtensions.cs" />
     <Compile Include="Utils\HelperExtensions.cs" />

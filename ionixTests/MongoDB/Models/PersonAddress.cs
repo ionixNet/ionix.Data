@@ -5,7 +5,9 @@
     using ionix.Data.MongoDB;
 
     [MongoCollection(Database = "TestDb", Name = "PersonAddress")]
-    [MongoIndex("PersonId", Unique = true)]
+    [MongoIndex("PersonId", "AddressId")]
+    [MongoIndex("AddressId")]
+    [MongoIndex("AddressId")]
     public class PersonAddress
     {
         [BsonId]
@@ -13,6 +15,8 @@
 
         public ObjectId PersonId { get; set; }
 
-        public string Description { get; set; }
+        public ObjectId AddressId { get; set; }
+
+        public bool Active { get; set; } = true;
     }
 }

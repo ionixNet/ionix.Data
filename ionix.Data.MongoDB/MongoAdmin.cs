@@ -15,15 +15,15 @@
             return "{ eval: \"" + script + "\"}";
         }
 
-        public static void ExecuteScript<TEntity>(IMongoDatabase db, string script)
+        public static TEntity ExecuteScript<TEntity>(IMongoDatabase db, string script)
         {
             var command = new JsonCommand<TEntity>(ConvertToEvalScript(script));
 
-            db.RunCommand(command);
+            return db.RunCommand(command);
         }
-        public static void ExecuteScript(IMongoDatabase db, string script)
+        public static BsonDocument ExecuteScript(IMongoDatabase db, string script)
         {
-            ExecuteScript<BsonDocument>(db, script);
+            return ExecuteScript<BsonDocument>(db, script);
         }
 
         private static void EnsureClient(IMongoClient client)

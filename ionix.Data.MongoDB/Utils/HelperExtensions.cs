@@ -4,6 +4,7 @@
 
     public static class HelperExtensions
     {
+
         public static ObjectId ToObjectId(this string id)
         {
             ObjectId temp;
@@ -37,6 +38,16 @@
                 return temp != ObjectId.Empty;
             }
             return false;
+        }
+
+        public static bool IsEmpty(this ObjectId id)
+        {
+            return id == ObjectId.Empty;
+        }
+
+        public static bool IsEmpty(this ObjectId? id)
+        {
+            return id == ObjectId.Empty;
         }
     }
 }

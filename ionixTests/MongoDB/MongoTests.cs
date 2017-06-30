@@ -24,6 +24,8 @@
         static MongoTests()
         {
             MongoClientProxy.SetConnectionString(MongoAddress);
+            MongoHelper.InitializeMongo(new Migration100().GetMigrationsAssembly(),
+                MongoAddress, DbContext.DatabaseName, false);
         }
 
         private static IEnumerable<TEntity> CreateMockData<TEntity>(int limit)
@@ -39,7 +41,8 @@
             dic.Add(typeof(string), (en, pi) => pi.SetValue(en, Guid.NewGuid().ToString()));
             dic.Add(typeof(int), (en, pi) => pi.SetValue(en, rnd.Next(10, int.MaxValue)));
             dic.Add(typeof(bool), (en, pi) => pi.SetValue(en, rnd.Next(2, 100) % 2 == 0));
-            dic.Add(typeof(DateTimeOffset), (en, pi) => pi.SetValue(en, DateTimeOffset.Now));
+            dic.Add(typeof(DateTime), (en, pi) => pi.SetValue(en, DateTime.Now));
+            dic.Add(typeof(DateTime?), (en, pi) => pi.SetValue(en, DateTime.Now));
             dic.Add(typeof(TimeSpan), (en, pi) => pi.SetValue(en, TimeSpan.MinValue));
             dic.Add(typeof(UInt16), (en, pi) => pi.SetValue(en, (UInt16)rnd.Next(10, UInt16.MaxValue)));
             dic.Add(typeof(byte), (en, pi) => pi.SetValue(en, (byte)rnd.Next(10, byte.MaxValue)));
@@ -61,31 +64,37 @@
 
             return list;
         }
+
+        private const int Limit = 1000;
         private static Task InsertMany<TEntity>()
             where TEntity : new()
         {
-            return new MongoRepository<TEntity>().InsertManyAsync(CreateMockData<TEntity>(100));
+            return new MongoRepository<TEntity>(MongoClientProxy.Instance).InsertManyAsync(CreateMockData<TEntity>(Limit));
         }
-        private static void InsertAssetTag()
+
+        private static readonly Mongo Cmd = new Mongo(MongoClientProxy.Instance);
+
+        private static void InsertPersonAddress()
         {
             Stopwatch bench = Stopwatch.StartNew();
-            var assetList = Mongo.Cmd.AsQueryable<Person>().ToList();
+            var personList = Cmd.AsQueryable<Person>().ToList();
+            var addressList = Cmd.AsQueryable<Address>().ToList();
 
-           // Random rnd = new Random();
+            Random rnd = new Random();
 
-            foreach (Person person in assetList)
+            foreach (Person person in personList)
             {
                 for (int j = 0; j < 3; ++j)
                 {
                     PersonAddress en = new PersonAddress();
                     en.PersonId = person.Id;
-                    en.Description = Guid.NewGuid().ToString("N");
+                    en.AddressId = addressList[rnd.Next(0, Limit)].Id;
 
-                    if (Mongo.Cmd.AsQueryable<PersonAddress>().FirstOrDefault(p => p.PersonId == en.PersonId) == null)
+                    if (Cmd.AsQueryable<PersonAddress>().FirstOrDefault(p => p.PersonId == en.PersonId) == null)
                     {
                         try
                         {
-                            Mongo.Cmd.InsertOne(en);
+                            Cmd.InsertOne(en);
                         }
                         catch { }
                     }
@@ -99,34 +108,27 @@
         //[TestMethod]
         public void Initialize()
         {
-            //Migration
-            var runner = new MigrationRunner(MongoAddress, "TestDb");
 
-            runner.MigrationLocator.LookForMigrationsInAssembly(Assembly.GetExecutingAssembly());
-            // runner.MigrationLocator.LookForMigrationsInAssemblyOfType<Migration1>();
-           // runner.DatabaseStatus.ThrowIfNotLatestVersion();
-            runner.UpdateToLatest();
-
-            //
-
-            var db = MongoAdmin.GetDatabase(MongoClientProxy.Instance, "TestDb");
+            var db = MongoAdmin.GetDatabase(MongoClientProxy.Instance, DbContext.DatabaseName);
              MongoAdmin.ExecuteScript(db, "db.LdapUser.remove({});");
             // MongoAdmin.ExecuteScript(db, "db.LdapUser.drop();");
 
-            string json = File.ReadAllText("d:\\sil.txt");
+            //string json = File.ReadAllText("d:\\sil.txt");
 
 
-            var list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<LdapUser>>(json);
-            Mongo.Cmd.InsertMany(list);
+            //var list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<LdapUser>>(json);
+            //Cmd.InsertMany(list);
 
 
-            MongoAdmin.ExecuteScript(db, "db.Asset.remove({});");
-            MongoAdmin.ExecuteScript(db, "db.AssetTag.remove({});");
+            MongoAdmin.ExecuteScript(db, "db.Person.remove({});");
+            MongoAdmin.ExecuteScript(db, "db.Address.remove({});");
+            MongoAdmin.ExecuteScript(db, "db.PersonAddress.remove({});");
 
             InsertMany<Person>().Wait();
-            InsertAssetTag();
+            InsertMany<Address>().Wait();
+            InsertPersonAddress();
 
-            var result = Mongo.Cmd.Count<Person>();
+            var result = Cmd.Count<Person>();
 
 
             Assert.AreNotEqual(result, 0);
@@ -135,7 +137,7 @@
         [TestMethod]
         public void CountTest()
         {
-            var result = Mongo.Cmd.Count<Person>();
+            var result = Cmd.Count<Person>();
 
             Assert.AreNotEqual(result, 0);
         }
@@ -143,7 +145,7 @@
         [TestMethod]
         public async Task CountAsyncTest()
         {
-            var result = await Mongo.Cmd.CountAsync<Person>();
+            var result = await Cmd.CountAsync<Person>();
 
             Assert.AreNotEqual(result, 0);
         }
@@ -151,8 +153,9 @@
         [TestMethod]
         public void AsQueryableTest()
         {
-            var result = (from a in Mongo.Cmd.AsQueryable<Person>()
-                join at in Mongo.Cmd.AsQueryable<PersonAddress>() on a.Id equals at.PersonId
+
+            var result = (from a in Cmd.AsQueryable<Person>()
+                join at in Cmd.AsQueryable<PersonAddress>() on a.Id equals at.PersonId
                 select new { Asset = a, AssetTag = at }).Take(10);
 
             var resultList = result.ToList();
@@ -164,11 +167,11 @@
         [TestMethod]
         public void GetByIdTest()
         {
-            var asset = Mongo.Cmd.AsQueryable<Person>().FirstOrDefault();
+            var asset = Cmd.AsQueryable<Person>().FirstOrDefault();
             if (null == asset)
                 Assert.Fail();
 
-            asset = Mongo.Cmd.GetById<Person>(asset.Id);
+            asset = Cmd.GetById<Person>(asset.Id);
 
             Assert.IsNotNull(asset);
         }
@@ -176,11 +179,11 @@
         [TestMethod]
         public async Task GetByIdAsyncTest()
         {
-            var asset = Mongo.Cmd.AsQueryable<Person>().FirstOrDefault();
+            var asset = Cmd.AsQueryable<Person>().FirstOrDefault();
             if (null == asset)
                 Assert.Fail();
 
-            asset = await Mongo.Cmd.GetByIdAsync<Person>(asset.Id);
+            asset = await Cmd.GetByIdAsync<Person>(asset.Id);
 
             Assert.IsNotNull(asset);
         }
@@ -199,9 +202,9 @@
         public void InsertOneTest()
         {
             Person asset = CreateAsset();
-            Mongo.Cmd.InsertOne(asset);
+            Cmd.InsertOne(asset);
 
-            asset = Mongo.Cmd.AsQueryable<Person>().FirstOrDefault(p => p.Name.Contains(asset.Name));
+            asset = Cmd.AsQueryable<Person>().FirstOrDefault(p => p.Name.Contains(asset.Name));
 
             Assert.IsNotNull(asset);
         }
@@ -210,9 +213,9 @@
         public async Task InsertOneAsyncTest()
         {
             Person asset = CreateAsset();
-            await Mongo.Cmd.InsertOneAsync(asset);
+            await Cmd.InsertOneAsync(asset);
 
-            asset = Mongo.Cmd.AsQueryable<Person>().FirstOrDefault(p => p.Name.Contains(asset.Name));
+            asset = Cmd.AsQueryable<Person>().FirstOrDefault(p => p.Name.Contains(asset.Name));
 
             Assert.IsNotNull(asset);
         }
@@ -228,9 +231,9 @@
                 list.Add(CreateAsset());
             }
 
-            Mongo.Cmd.InsertMany(list);
+            Cmd.InsertMany(list);
 
-            list = Mongo.Cmd.AsQueryable<Person>().Where(p => p.Name.Contains("Yeni")).ToList();
+            list = Cmd.AsQueryable<Person>().Where(p => p.Name.Contains("Yeni")).ToList();
 
             Assert.AreNotEqual(list.Count, 0);
         }
@@ -244,9 +247,9 @@
                 list.Add(CreateAsset());
             }
 
-            await Mongo.Cmd.InsertManyAsync(list);
+            await Cmd.InsertManyAsync(list);
 
-            list = Mongo.Cmd.AsQueryable<Person>().Where(p => p.Name.Contains("Yeni")).ToList();
+            list = Cmd.AsQueryable<Person>().Where(p => p.Name.Contains("Yeni")).ToList();
 
             Assert.AreNotEqual(list.Count, 0);
         }
@@ -254,16 +257,16 @@
         [TestMethod]
         public void ReplaceOneTest()
         {
-            var asset = Mongo.Cmd.AsQueryable<Person>().FirstOrDefault();
+            var asset = Cmd.AsQueryable<Person>().FirstOrDefault();
             if (null == asset)
                 Assert.Fail();
 
             string orginal = asset.Name;
 
             asset.Name = "Replaced_" + Guid.NewGuid().ToString("N");
-            Mongo.Cmd.ReplaceOne(p => p.Id == asset.Id, asset);
+            Cmd.ReplaceOne(p => p.Id == asset.Id, asset);
 
-            asset = Mongo.Cmd.GetById<Person>(asset.Id);
+            asset = Cmd.GetById<Person>(asset.Id);
 
             bool result = orginal != asset.Name;
 
@@ -273,9 +276,9 @@
 
                 asset.Name = "Replaced_" + Guid.NewGuid().ToString("N");
 
-                Mongo.Cmd.ReplaceOne(asset);
+                Cmd.ReplaceOne(asset);
 
-                asset = Mongo.Cmd.GetById<Person>(asset.Id);
+                asset = Cmd.GetById<Person>(asset.Id);
 
                 result = orginal != asset.Name;
             }
@@ -286,16 +289,16 @@
         [TestMethod]
         public async Task ReplaceOneAsyncTest()
         {
-            var asset = Mongo.Cmd.AsQueryable<Person>().FirstOrDefault();
+            var asset = Cmd.AsQueryable<Person>().FirstOrDefault();
             if (null == asset)
                 Assert.Fail();
 
             string orginal = asset.Name;
 
             asset.Name = "Replaced_" + Guid.NewGuid().ToString("N");
-            await Mongo.Cmd.ReplaceOneAsync(p => p.Id == asset.Id, asset);
+            await Cmd.ReplaceOneAsync(p => p.Id == asset.Id, asset);
 
-            asset = await Mongo.Cmd.GetByIdAsync<Person>(asset.Id);
+            asset = await Cmd.GetByIdAsync<Person>(asset.Id);
 
             bool result = orginal != asset.Name;
 
@@ -305,9 +308,9 @@
 
                 asset.Name = "Replaced_" + Guid.NewGuid().ToString("N");
 
-                await Mongo.Cmd.ReplaceOneAsync(asset);
+                await Cmd.ReplaceOneAsync(asset);
 
-                asset = await Mongo.Cmd.GetByIdAsync<Person>(asset.Id);
+                asset = await Cmd.GetByIdAsync<Person>(asset.Id);
 
                 result = orginal != asset.Name;
             }
@@ -318,7 +321,7 @@
         [TestMethod]
         public void UpdateOneTest()
         {
-            var asset = Mongo.Cmd.AsQueryable<Person>().FirstOrDefault();
+            var asset = Cmd.AsQueryable<Person>().FirstOrDefault();
             if (null == asset)
                 Assert.Fail();
 
@@ -326,25 +329,25 @@
 
             string assetStr = asset.Name;
 
-            Mongo.Cmd.UpdateOne<Person>(p => p.Id == asset.Id,
+            Cmd.UpdateOne<Person>(p => p.Id == asset.Id,
                 (builder) => builder.Set(p => p.Name, assetStr));
 
-            bool result = Mongo.Cmd.GetById<Person>(asset.Id).Name == assetStr;
+            bool result = Cmd.GetById<Person>(asset.Id).Name == assetStr;
 
             if (result)
             {
                 asset.Name = "UpdateOne_" + Guid.NewGuid().ToString("N");
                 assetStr = asset.Name;
 
-                Mongo.Cmd.UpdateOne<Person>(asset.Id,
+                Cmd.UpdateOne<Person>(asset.Id,
                     (builder) => builder.Set(p => p.Name, assetStr));
 
-                result = Mongo.Cmd.GetById<Person>(asset.Id).Name == assetStr;
+                result = Cmd.GetById<Person>(asset.Id).Name == assetStr;
 
                 asset.Name = "Mehmet 2";
                 asset.Description = "Gören 2";
 
-                Mongo.Cmd.UpdateOne(asset, p => p.Name, p => p.Description);
+                Cmd.UpdateOne(asset, p => p.Name, p => p.Description);
             }
 
             Assert.IsTrue(result);
@@ -353,7 +356,7 @@
         [TestMethod]
         public async Task UpdateOneAsyncTest()
         {
-            var asset = Mongo.Cmd.AsQueryable<Person>().FirstOrDefault();
+            var asset = Cmd.AsQueryable<Person>().FirstOrDefault();
             if (null == asset)
                 Assert.Fail();
 
@@ -361,20 +364,20 @@
 
             string assetStr = asset.Name;
 
-            await Mongo.Cmd.UpdateOneAsync<Person>(p => p.Id == asset.Id,
+            await Cmd.UpdateOneAsync<Person>(p => p.Id == asset.Id,
                 (builder) => builder.Set(p => p.Name, assetStr));
 
-            bool result = (await Mongo.Cmd.GetByIdAsync<Person>(asset.Id)).Name == assetStr;
+            bool result = (await Cmd.GetByIdAsync<Person>(asset.Id)).Name == assetStr;
 
             if (result)
             {
                 asset.Name = "UpdateOne_" + Guid.NewGuid().ToString("N");
                 assetStr = asset.Name;
 
-                await Mongo.Cmd.UpdateOneAsync<Person>(asset.Id,
+                await Cmd.UpdateOneAsync<Person>(asset.Id,
                     (builder) => builder.Set(p => p.Name, assetStr));
 
-                result = (await Mongo.Cmd.GetByIdAsync<Person>(asset.Id)).Name == assetStr;
+                result = (await Cmd.GetByIdAsync<Person>(asset.Id)).Name == assetStr;
             }
 
             Assert.IsTrue(result);
@@ -384,7 +387,7 @@
         [TestMethod]
         public void UpdateManyTest()
         {
-            var result = Mongo.Cmd.UpdateMany<Person>(p => p.Active,
+            var result = Cmd.UpdateMany<Person>(p => p.Active,
                 (builder) => builder.Set(p => p.Active, false).Set(p => p.Description, "Mehmet"));
 
             Assert.IsNotNull(result);
@@ -393,26 +396,26 @@
         [TestMethod]
         public void DeleteOneTest()
         {
-            var asset = Mongo.Cmd.AsQueryable<Person>().FirstOrDefault();
+            var asset = Cmd.AsQueryable<Person>().FirstOrDefault();
             if (null == asset)
                 Assert.Fail();
 
-            var count = Mongo.Cmd.Count<Person>();
-            Mongo.Cmd.DeleteOne<Person>(p => p.Id == asset.Id);
+            var count = Cmd.Count<Person>();
+            Cmd.DeleteOne<Person>(p => p.Id == asset.Id);
 
-            var result = count - Mongo.Cmd.Count<Person>() == 1;
+            var result = count - Cmd.Count<Person>() == 1;
 
             if (result)
             {
                 count--;
 
-                asset = Mongo.Cmd.AsQueryable<Person>().FirstOrDefault();
+                asset = Cmd.AsQueryable<Person>().FirstOrDefault();
                 if (null == asset)
                     Assert.Fail();
 
-                Mongo.Cmd.DeleteOne<Person>(asset.Id);
+                Cmd.DeleteOne<Person>(asset.Id);
 
-                result = count - Mongo.Cmd.Count<Person>() == 1;
+                result = count - Cmd.Count<Person>() == 1;
             }
 
             Assert.IsTrue(result);
@@ -421,16 +424,16 @@
         [TestMethod]
         public async Task BulkReplaceAsyncTest()
         {
-            var list = await Mongo.Cmd.AsQueryable<Person>().OrderBy(p => p.Id).Take(10).ToListAsync();
+            var list = await Cmd.AsQueryable<Person>().OrderBy(p => p.Id).Take(10).ToListAsync();
 
 
             list.ForEach(i => i.Name = "Changed By Ela " + Guid.NewGuid().ToString("N"));
 
-            var result = await Mongo.Cmd.BulkReplaceAsync(list, null, false, p => p.Name);
+            var result = await Cmd.BulkReplaceAsync(list, null, false, p => p.Name);
 
             list.ForEach(i => i.Description = "Changed By Ela 2");
 
-            result = await Mongo.Cmd.BulkReplaceAsync(list, null, false);
+            result = await Cmd.BulkReplaceAsync(list, null, false);
 
             list.ForEach(i =>
             {
@@ -438,7 +441,7 @@
                 i.Name = Guid.NewGuid().ToString("N");
             });
 
-            result = await Mongo.Cmd.BulkReplaceAsync(list, null, true, p => p.Name);
+            result = await Cmd.BulkReplaceAsync(list, null, true, p => p.Name);
 
 
             list.ForEach(i =>
@@ -447,7 +450,7 @@
                 i.Name = Guid.NewGuid().ToString("N");
             });
 
-            result = await Mongo.Cmd.BulkReplaceAsync(list, null, true);
+            result = await Cmd.BulkReplaceAsync(list, null, true);
 
             Assert.IsNotNull(result);
         }
@@ -456,12 +459,12 @@
         public async Task BulkUpdateAsync()
         {
             const int limit = 10;
-            var list = await Mongo.Cmd.AsQueryable<Person>().OrderBy(p => p.Id).Take(limit).ToListAsync();
+            var list = await Cmd.AsQueryable<Person>().OrderBy(p => p.Id).Take(limit).ToListAsync();
 
             Random rnd = new Random();
             list.ForEach(i => i.Description = rnd.Next(0, 100000).ToString());
 
-            var result = await Mongo.Cmd.BulkUpdateAsync(list, null, p => p.Description);
+            var result = await Cmd.BulkUpdateAsync(list, null, p => p.Description);
 
             Assert.AreEqual((int)result.ModifiedCount, limit);
         }
@@ -470,14 +473,14 @@
         public async Task BulkDeleteAsync()
         {
             const int limit = 3;
-            var list = await Mongo.Cmd.AsQueryable<Person>().OrderByDescending(p => p.Id).Take(limit).ToListAsync();
+            var list = await Cmd.AsQueryable<Person>().OrderByDescending(p => p.Id).Take(limit).ToListAsync();
 
-            var result = await Mongo.Cmd.BulkDeleteAsync(list, null, p => p.Name);
+            var result = await Cmd.BulkDeleteAsync(list, null, p => p.Name);
 
             Assert.AreEqual((int)result.DeletedCount, limit);
 
-            list = await Mongo.Cmd.AsQueryable<Person>().OrderByDescending(p => p.Id).Take(limit).ToListAsync();
-            result = await Mongo.Cmd.BulkDeleteAsync(list, null);
+            list = await Cmd.AsQueryable<Person>().OrderByDescending(p => p.Id).Take(limit).ToListAsync();
+            result = await Cmd.BulkDeleteAsync(list, null);
 
             Assert.AreEqual((int)result.DeletedCount, limit);
         }
@@ -485,9 +488,9 @@
         [TestMethod]
         public async Task TextSearchTest()
         {
-            var list = Mongo.Cmd.TextSearch<LdapUser>("ağrı şaban");
+            var list = Cmd.TextSearch<LdapUser>("ağrı şaban");
 
-            list = await  Mongo.Cmd.TextSearchAsync<LdapUser>("bayburt");
+            list = await  Cmd.TextSearchAsync<LdapUser>("bayburt");
 
             Assert.IsNotNull(list);
         }

@@ -15,8 +15,6 @@
 
     public sealed class Mongo
     {
-        public static readonly Mongo Cmd = new Mongo();
-
         private readonly IMongoClient client;
         public Mongo(IMongoClient client)
         {
@@ -26,11 +24,6 @@
             this.client = client;
         }
 
-        public Mongo()
-            : this(MongoClientProxy.Instance)
-        {
-            
-        }
 
 
         public IMongoCollection<TEntity> Get<TEntity>()
@@ -145,6 +138,29 @@
             var idPi = GetIdProperty<TEntity>(true);
             return this.ReplaceOneInternal(GetIdFilterDefination<TEntity>(idPi.GetValue(entity)), entity, options);
         }
+
+        public ReplaceOneResult ReplaceOne<TEntity>(TEntity entity, UpdateOptions options, params Expression<Func<TEntity, object>>[] filterFields)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+            if (null == filterFields || 0 == filterFields.Length)
+                throw new ArgumentException($"{nameof(filterFields)} should not be null or empty");
+
+            var properties = filterFields.Select(ReflectionExtensions.GetPropertyInfo).ToList();
+            List<WriteModel<TEntity>> requests = new List<WriteModel<TEntity>>();
+
+            var dic = new Dictionary<string, object>();
+            foreach (PropertyInfo pi in properties)
+            {
+                dic[pi.Name] = pi.GetValue(entity);
+            }
+            BsonDocument bd = new BsonDocument(dic);
+
+            FilterDefinition<TEntity> fd = bd;
+
+            return this.ReplaceOneInternal<TEntity>(fd, entity, options);
+        }
+
 
 
         private Task<ReplaceOneResult> ReplaceOneInternalAsync<TEntity>(FilterDefinition<TEntity> filterDefination

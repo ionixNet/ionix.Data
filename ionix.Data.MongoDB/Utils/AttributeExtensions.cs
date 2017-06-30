@@ -41,8 +41,7 @@
                 }
 
                 sb.Append("}")
-                    .Append(" )")
-                    .AppendLine();
+                    .Append(" )");
 
                 return sb.ToString();
             }
@@ -72,22 +71,22 @@
                         }
 
                         sb.Append("db.")
-                        .Append(GetCollectionName(owner))
-                        .Append(".createIndex( { ");
+                            .Append(GetCollectionName(owner))
+                            .Append(".createIndex( { ");
                         foreach (var field in attr.Fields)
                         {
                             sb.Append(field)
                                 .Append(": 1, ");
                         }
                         sb.Remove(sb.Length - 2, 2)
-                        .Append(" }, { ")//options
-                        .Append("name: '")
-                        .Append(name)
-                        .Append("', ")
-                        .Append("unique: ")
-                        .Append(attr.Unique.ToString().ToLower())
-                        .Append(" }")
-                        .Append(" )");
+                            .Append(" }, { ")//options
+                            .Append("name: '")
+                            .Append(name)
+                            .Append("', ")
+                            .Append("unique: ")
+                            .Append(attr.Unique.ToString().ToLower())
+                            .Append(" }")
+                            .Append(" )");
 
                         scripts.Add(sb.ToString());
                     }

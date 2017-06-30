@@ -2,20 +2,21 @@
 //{
 //    using System;
 //    using System.Reflection;
+//    using System.Text;
 
-//    public class Migration100 : Migration.Migration
+//    public class Migration100 : MigrationBase
 //    {
-//        public const string DatabaseName = "TestDb";
-
 //        public Migration100()
 //            : base("1.0.0")
 //        {
 //        }
 
-//        public override void Update()
-//        {
-//            var libAssembly = GetLibAssembly();
 
+//        public override string GenerateMigrationScript()
+//        {
+//            var libAssembly = GetMigrationsAssembly();
+
+//            StringBuilder sb = new StringBuilder();
 //            foreach (var type in libAssembly.GetTypes())
 //            {
 //                var typeInfo = type.GetTypeInfo();
@@ -25,7 +26,8 @@
 //                    if (String.IsNullOrEmpty(collAttr.Database) || collAttr.Database == DatabaseName)
 //                    {
 //                        string script = collAttr.Script(type);
-//                        MongoAdmin.ExecuteScript(this.Database, script);
+
+//                        sb.Append(script).Append("; ");
 //                    }
 
 //                    //default index
@@ -34,7 +36,8 @@
 //                    {
 //                        foreach (var script in indexAttrList.Scripts(type))
 //                        {
-//                            MongoAdmin.ExecuteScript(this.Database, script);
+
+//                            sb.Append(script).Append("; ");
 //                        }
 //                    }
 
@@ -44,17 +47,13 @@
 //                    {
 //                        foreach (var script in textIndexAttrList.Scripts(type))
 //                        {
-//                            MongoAdmin.ExecuteScript(this.Database, script);
+//                            sb.Append(script).Append("; ");
 //                        }
 //                    }
 //                }
 //            }
-//        }
 
-//        public static Assembly GetLibAssembly()
-//        {
-//            var name = new AssemblyName("<assembly name here!");
-//            return Assembly.Load(name);
+//            return sb.ToString();
 //        }
 //    }
 //}

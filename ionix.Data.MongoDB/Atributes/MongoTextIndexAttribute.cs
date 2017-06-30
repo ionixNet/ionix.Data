@@ -25,6 +25,6 @@
 
         public string DefaultLanguage { get; set; } = "tr";
 
-       // public string LanguageOverride { get; set; } = "language";
+        // public string LanguageOverride { get; set; } = "language";
     }
 }

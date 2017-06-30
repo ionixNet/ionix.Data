@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
+    using System.Threading;
     using System.Threading.Tasks;
     using global::MongoDB.Driver;
     using global::MongoDB.Driver.Linq;
@@ -11,15 +12,11 @@
     public class MongoRepository<TEntity>
     {
         private readonly Mongo mongo;
+        private readonly IMongoClient client;
         public MongoRepository(IMongoClient client)
         {
             this.mongo = new Mongo(client);
-        }
-
-        public MongoRepository()
-            : this(MongoClientProxy.Instance)
-        {
-            
+            this.client = client;
         }
 
         public IMongoCollection<TEntity> Collection => this.mongo.Get<TEntity>();
@@ -89,6 +86,26 @@
         public ReplaceOneResult ReplaceOne(TEntity entity, UpdateOptions options = null)
         {
             return this.mongo.ReplaceOne(entity, options);
+        }
+
+        public ReplaceOneResult ReplaceOne(TEntity entity, UpdateOptions options, params Expression<Func<TEntity, object>>[] filterFields)
+        {
+            return this.mongo.ReplaceOne(entity, options, filterFields);
+        }
+
+        /// <summary>
+        /// Replace or Insert
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="filterFields"></param>
+        /// <returns></returns>
+        public ReplaceOneResult ReplasertOne(TEntity entity, params Expression<Func<TEntity, object>>[] filterFields)
+        {
+            return this.mongo.ReplaceOne(entity, new UpdateOptions() { IsUpsert = true }, filterFields);
+        }
+        public ReplaceOneResult ReplasertOne(TEntity entity)
+        {
+            return this.mongo.ReplaceOne(entity, new UpdateOptions() { IsUpsert = true });
         }
 
         //waring: _id values in MongoDB documents are immutable. If you specify an _id in the replacement document, it must match the _id of the existing document.
@@ -192,6 +209,17 @@
 
 
         #region   |   BulkReplace  |
+
+        public Task<BulkWriteResult<TEntity>> BulkReplaceAsync(Func<TEntity, Expression<Func<TEntity, bool>>> filter, IEnumerable<TEntity> list, CancellationToken ct = default(CancellationToken))
+        {
+            List<ReplaceOneModel<TEntity>> operations = new List<ReplaceOneModel<TEntity>>();
+            foreach (var mng in list)
+            {
+                Expression<Func<TEntity, bool>> exp = filter(mng);
+                operations.Add(new ReplaceOneModel<TEntity>(exp, mng));
+            }
+            return MongoAdmin.GetCollection<TEntity>(this.client).BulkWriteAsync(operations);
+        }
 
         public Task<BulkWriteResult<TEntity>> BulkReplaceAsync(IEnumerable<TEntity> list, BulkWriteOptions options, bool isUpsert, params Expression<Func<TEntity, object>>[] filterFields)
         {

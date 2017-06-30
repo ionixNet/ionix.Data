@@ -5,80 +5,104 @@
 	using global::MongoDB.Driver;
 
     public class DatabaseMigrationStatus
-	{
-		private readonly MigrationRunner _Runner;
+    {
+        private readonly MigrationRunner _Runner;
 
-		public string VersionCollectionName = "DatabaseVersion";
+        public string VersionCollectionName = "DatabaseVersion";
 
-		public DatabaseMigrationStatus(MigrationRunner runner)
-		{
-			_Runner = runner;
-		}
+        public DatabaseMigrationStatus(MigrationRunner runner)
+        {
+            _Runner = runner;
+        }
 
-		public virtual IMongoCollection<AppliedMigration> GetMigrationsApplied()
-		{
-			return _Runner.Database.GetCollection<AppliedMigration>(VersionCollectionName);
-		}
+        public virtual IMongoCollection<AppliedMigration> GetMigrationsApplied()
+        {
+            return _Runner.Database.GetCollection<AppliedMigration>(VersionCollectionName);
+        }
 
-		public virtual bool IsNotLatestVersion()
-		{
-			return _Runner.MigrationLocator.LatestVersion()
-			       != GetVersion();
-		}
+        public virtual bool IsNotLatestVersion()
+        {
+            return _Runner.MigrationLocator.LatestVersion()
+                   != GetVersion();
+        }
 
-		public virtual void ThrowIfNotLatestVersion()
-		{
-			if (!IsNotLatestVersion())
-			{
-				return;
-			}
-			var databaseVersion = GetVersion();
-			var migrationVersion = _Runner.MigrationLocator.LatestVersion();
-			throw new Exception("Database is not the expected version, database is at version: " + databaseVersion + ", migrations are at version: " + migrationVersion);
-		}
+        public virtual void ThrowIfNotLatestVersion()
+        {
+            if (!IsNotLatestVersion())
+            {
+                return;
+            }
+            var databaseVersion = GetVersion();
+            var migrationVersion = _Runner.MigrationLocator.LatestVersion();
+            throw new Exception("Database is not the expected version, database is at version: " + databaseVersion + ", migrations are at version: " + migrationVersion);
+        }
 
-		public virtual MigrationVersion GetVersion()
-		{
-			var lastAppliedMigration = GetLastAppliedMigration();
-			return lastAppliedMigration == null
-			       	? MigrationVersion.Default()
-			       	: lastAppliedMigration.Version;
-		}
+        public void ValidateMigrationsVersions()
+        {
+            var dbAllMigrations = GetMigrationsApplied().AsQueryable() // in memory but this will never get big enough to matter
+                .OrderBy(v => v.Version).ToList();
 
-		public virtual AppliedMigration GetLastAppliedMigration()
-		{
-			return GetMigrationsApplied().AsQueryable() // in memory but this will never get big enough to matter
-				.OrderByDescending(v => v.Version)
-				.FirstOrDefault();
-		}
+            var incompletedVersions = dbAllMigrations.Where(m => m.CompletedOn == null).Select(m => m.Version).ToList();
+            if (incompletedVersions.Any())
+            {
+                throw new MigrationException($"Migrations : {string.Join(",", incompletedVersions)} are incomplete. Please contact administrator", new InvalidOperationException());
+            }
 
-		public virtual AppliedMigration StartMigration(Migration migration)
-		{
-			var appliedMigration = new AppliedMigration(migration);
-			GetMigrationsApplied().InsertOne(appliedMigration);
-			return appliedMigration;
-		}
+            var appAllMigrations = _Runner.MigrationLocator.GetAllMigrations().OrderBy(m => m.Version).ToList();
 
-		public virtual void CompleteMigration(AppliedMigration appliedMigration)
-		{
-			appliedMigration.CompletedOn = DateTime.Now;
+            if (dbAllMigrations.Count > appAllMigrations.Count)
+            {
+                throw new MigrationException($"The number of migrations in db ({dbAllMigrations.Count}) is higher than the migration in applications ({appAllMigrations.Count}). Migrations names : {string.Join(",", dbAllMigrations.Skip(appAllMigrations.Count).Select(m => m.Version))}", new InvalidOperationException());
+            }
+
+            for (int i = 0; i < dbAllMigrations.Count; i++)
+            {
+                if (dbAllMigrations[i].Version != appAllMigrations[i].Version)
+                {
+                    throw new MigrationException($"Conflict of migration no {i}. In db is \"{dbAllMigrations[i].Version}\" application is \"{appAllMigrations[i].Version}\".", new InvalidOperationException());
+                }
+                if (dbAllMigrations[i].Script != appAllMigrations[i].Script)
+                {
+                    throw new MigrationException($"Conflict of migration no {i}. In db script is : \n{dbAllMigrations[i].Script}\n\nin application is:\n{appAllMigrations[i].Script}", new InvalidOperationException());
+                }
+            }
+        }
+
+        public virtual MigrationVersion GetVersion()
+        {
+            var lastAppliedMigration = GetLastAppliedMigration();
+            return lastAppliedMigration == null
+                ? MigrationVersion.Default()
+                : lastAppliedMigration.Version;
+        }
+
+        public virtual AppliedMigration GetLastAppliedMigration()
+        {
+            return GetMigrationsApplied().AsQueryable() // in memory but this will never get big enough to matter
+                .OrderByDescending(v => v.Version)
+                .FirstOrDefault();
+        }
+
+        public virtual AppliedMigration StartMigration(Migration migration)
+        {
+            var appliedMigration = new AppliedMigration(migration);
+            GetMigrationsApplied().InsertOne(appliedMigration);
+            return appliedMigration;
+        }
+
+        public virtual void CompleteMigration(AppliedMigration appliedMigration)
+        {
+            appliedMigration.CompletedOn = DateTime.Now;
+            FindOneAndReplace(appliedMigration);
+            // GetMigrationsApplied().FindOneAndReplace
+            //  (Builders<AppliedMigration>.Filter.Eq(p => p.Version, appliedMigration.Version), appliedMigration);
+            // appliedMigration, appliedMigration);
+        }
+
+        public void FindOneAndReplace(AppliedMigration appliedMigration)
+        {
             GetMigrationsApplied().FindOneAndReplace
                 (Builders<AppliedMigration>.Filter.Eq(p => p.Version, appliedMigration.Version), appliedMigration);
-                // appliedMigration, appliedMigration);
-		}
-
-		public virtual void MarkUpToVersion(MigrationVersion version)
-		{
-			_Runner.MigrationLocator.GetAllMigrations()
-				.Where(m => m.Version <= version)
-				.ToList()
-				.ForEach(m => MarkVersion(m.Version));
-		}
-
-		public virtual void MarkVersion(MigrationVersion version)
-		{
-			var appliedMigration = AppliedMigration.MarkerOnly(version);
-			GetMigrationsApplied().InsertOne(appliedMigration);
-		}
-	}
+        }
+    }
 }

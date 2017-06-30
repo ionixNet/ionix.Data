@@ -2,30 +2,32 @@
 {
     using System;
     using System.Reflection;
+    using System.Text;
 
-    public class Migration100 : Migration.Migration
+    public class Migration100 : MigrationBase
     {
-        public const string DatabaseName = "TestDb";
-
         public Migration100()
             : base("1.0.0")
         {
         }
 
-        public override void Update()
-        {
-            var libAssembly = GetLibAssembly();
 
+        public override string GenerateMigrationScript()
+        {
+            var libAssembly = GetMigrationsAssembly();
+
+            StringBuilder sb = new StringBuilder();
             foreach (var type in libAssembly.GetTypes())
             {
                 var typeInfo = type.GetTypeInfo();
                 var collAttr = typeInfo.GetCustomAttribute<MongoCollectionAttribute>();
                 if (null != collAttr)
                 {
-                    if (String.IsNullOrEmpty(collAttr.Database) || collAttr.Database == DatabaseName)
+                    if (String.IsNullOrEmpty(collAttr.Database) || collAttr.Database == "TestDb")
                     {
                         string script = collAttr.Script(type);
-                        MongoAdmin.ExecuteScript(this.Database, script);
+
+                        sb.Append(script).Append("; ");
                     }
 
                     //default index
@@ -34,7 +36,8 @@
                     {
                         foreach (var script in indexAttrList.Scripts(type))
                         {
-                            MongoAdmin.ExecuteScript(this.Database, script);
+
+                            sb.Append(script).Append("; ");
                         }
                     }
 
@@ -44,16 +47,16 @@
                     {
                         foreach (var script in textIndexAttrList.Scripts(type))
                         {
-                            MongoAdmin.ExecuteScript(this.Database, script);
+                            sb.Append(script).Append("; ");
                         }
                     }
                 }
             }
-        }
 
-        public static Assembly GetLibAssembly()
-        {
-            return Assembly.GetExecutingAssembly();
+            if (sb.Length == 0)
+                throw  new InvalidOperationException("No Migration type found on '" + libAssembly.FullName + "'");
+
+            return sb.ToString();
         }
     }
 }
