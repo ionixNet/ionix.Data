@@ -106,7 +106,7 @@
             Console.WriteLine($"{typeof(PersonAddress).Name}, Elepsad: {bench.ElapsedTicks}");
         }
 
-        //[TestMethod]
+       // [TestMethod]
         public void Initialize()
         {
 
@@ -562,7 +562,7 @@
 
 
             var x = Cmd.AsQueryable<Person>().FirstOrDefault();
-            var y = DictionarySerializer.Serialize(x);
+            var y = x.ToDictionary();
 
             var dic = MongoAdmin.ExecuteScript(MongoAdmin.GetDatabase(MongoClientProxy.Instance
                 , DbContext.DatabaseName), script).ToDictionary();
@@ -573,13 +573,13 @@
             {
                 var myDic = dicItem as IDictionary<string, object>;
 
-                PersonAddress model = DictionarySerializer.Deserialize<PersonAddress>(myDic);
+                PersonAddress model = myDic.To<PersonAddress>();
 
                 var personDic = myDic["Person"] as IDictionary<string, object>;
-                var person = DictionarySerializer.Deserialize<Person>(personDic);
+                var person = personDic.To<Person>();
 
                 var addressDic = myDic["Address"] as IDictionary<string, object>;
-                var adress = DictionarySerializer.Deserialize<Address>(addressDic);
+                var adress = addressDic.To<Address>();
             }
             
             Assert.Fail();

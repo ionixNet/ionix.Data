@@ -9,7 +9,18 @@
 
     public static class DictionarySerializer
     {
-        private const string IdField = "_id";
+        public static string GetFieldName(PropertyInfo pi)
+        {
+            BsonIdAttribute bia = pi.GetCustomAttribute<BsonIdAttribute>();
+            if (null != bia)
+                return "_id";
+            BsonElementAttribute bea = pi.GetCustomAttribute<BsonElementAttribute>();
+            if (null != bea)
+                return bea.ElementName;
+
+            return pi.Name;
+        }
+
         //_id olmuyor.
         private static IDictionary<string, PropertyInfo> GetValidProperties(Type type)
         {
@@ -29,19 +40,14 @@
                     if (ReflectionExtensions.IsEnumerable(pi.PropertyType))
                         continue;
                 }
-                if (pi.GetCustomAttribute<BsonIdAttribute>() != null)
-                {
-                    ret[IdField] = pi;
-                    continue;
-                }
 
-                ret[pi.Name] = pi;
+                ret[GetFieldName(pi)] = pi;
             }
 
             return ret;
         }
 
-        public static IDictionary<string, object> Serialize(object model)
+        public static IDictionary<string, object> ToDictionary(this object model)
         {
             Dictionary<string, object> ret = new Dictionary<string, object>();
             if (null != model)
@@ -54,7 +60,7 @@
             return ret;
         }
 
-        public static object Deserialize(IDictionary<string, object> dic, Type target)
+        public static object To(this IDictionary<string, object> dic, Type target)
         {
             if (null != dic && null != target)
             {
@@ -77,9 +83,9 @@
             return null;
         }
 
-        public static T Deserialize<T>(IDictionary<string, object> dic)
+        public static T To<T>(this IDictionary<string, object> dic)
         {
-            return (T) Deserialize(dic, typeof(T));
+            return (T)To(dic, typeof(T));
         }
     }
 }

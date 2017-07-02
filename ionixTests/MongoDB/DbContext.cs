@@ -27,7 +27,10 @@
 
         public DbContext(IMongoClient client)
         {
-            this.MongoClient = client ?? throw new ArgumentNullException(nameof(client));
+            if (null == client)
+                throw new ArgumentNullException(nameof(client));
+
+            this.MongoClient = client;
 
             if (!_initialedGlobally)
             {

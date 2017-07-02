@@ -72,26 +72,9 @@
             return client.GetDatabase(name);
         }
 
-        private static MongoCollectionAttribute GetNames(Type type)
-        {
-            MongoCollectionAttribute ret = type.GetTypeInfo().GetCustomAttribute<MongoCollectionAttribute>();
-            if (null == ret)
-            {
-                string[] splits = type.FullName.Split('.');
-                if (splits.Length != 2)
-                    throw new InvalidOperationException(
-                        $"{type.FullName} is not compatible with CreateCollection desing rules. Use MongoCollectionAttribute to set database and collection name correctly or set namespace as Database and class name as collection.");
-
-                ret.Database = splits[0];
-                ret.Name = splits[1];
-            }
-
-            return ret;
-        }
-
         public static void CreateCollection<TEntity>(IMongoClient client)
         {
-            var info = GetNames(typeof(TEntity));
+            var info = HelperExtensions.GetNames(typeof(TEntity));
 
             var db = GetDatabase(client, info.Database);
 
@@ -100,7 +83,7 @@
 
         public static async void CreateCollectionAsync<TEntity>(IMongoClient client)
         {
-            var info = GetNames(typeof(TEntity));
+            var info = HelperExtensions.GetNames(typeof(TEntity));
 
             var db = GetDatabase(client, info.Database);
 
@@ -109,7 +92,7 @@
 
         public static IMongoCollection<TEntity> GetCollection<TEntity>(IMongoClient client)
         {
-            var info = GetNames(typeof(TEntity));
+            var info = HelperExtensions.GetNames(typeof(TEntity));
             var db = GetDatabase(client, info.Database);
             var table = db.GetCollection<TEntity>(info.Name);
             return table;
