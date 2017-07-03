@@ -1,4 +1,4 @@
-﻿namespace ionix.Data.MongoDB
+﻿namespace ionix.Data.MongoDB.Serializers
 {
     using global::MongoDB.Bson;
     using global::MongoDB.Bson.Serialization;

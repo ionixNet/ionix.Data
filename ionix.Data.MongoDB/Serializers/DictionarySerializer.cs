@@ -1,4 +1,4 @@
-﻿namespace ionix.Data.MongoDB
+﻿namespace ionix.Data.MongoDB.Serializers
 {
     using System;
     using System.Collections.Generic;
@@ -22,7 +22,7 @@
         }
 
         //_id olmuyor.
-        private static IDictionary<string, PropertyInfo> GetValidProperties(Type type)
+        public static IDictionary<string, PropertyInfo> GetValidProperties(Type type)
         {
             Dictionary<string, PropertyInfo> ret = new Dictionary<string, PropertyInfo>();
             foreach (var pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
@@ -86,6 +86,11 @@
         public static T To<T>(this IDictionary<string, object> dic)
         {
             return (T)To(dic, typeof(T));
+        }
+
+        public static T To<T>(this object dyn)
+        {
+            return (T)To(dyn as IDictionary<string, object>, typeof(T));
         }
     }
 }

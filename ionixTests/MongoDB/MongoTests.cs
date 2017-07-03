@@ -15,6 +15,7 @@
     using global::MongoDB.Driver.Linq;
     using ionix.Data.MongoDB;
     using ionix.Data.MongoDB.Migration;
+    using ionix.Data.MongoDB.Serializers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

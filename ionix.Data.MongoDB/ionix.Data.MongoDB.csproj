@@ -47,7 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Serializer\DictionarySerializer.cs" />
+    <Compile Include="Serializers\DictionarySerializer.cs" />
     <Compile Include="Usages\MigrationBase.cs" />
     <Compile Include="Atributes\MongoCollectionAttribute.cs" />
     <Compile Include="Atributes\MongoIndexAttribute.cs" />
@@ -66,7 +66,7 @@
     <Compile Include="Migration\MigrationVersion.cs" />
     <Compile Include="Migration\MigrationVersionSerializer.cs" />
     <Compile Include="MongoAdmin.cs" />
-    <Compile Include="Serializer\BsonSerializerExtensions.cs" />
+    <Compile Include="Serializers\BsonSerializerExtensions.cs" />
     <Compile Include="Models\Database.cs" />
     <Compile Include="Mongo.cs" />
     <Compile Include="MongoClientProxy.cs" />
