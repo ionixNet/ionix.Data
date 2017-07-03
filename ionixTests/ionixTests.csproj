@@ -111,9 +111,7 @@
       <Name>ionix.Utils</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="silinecek\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Models\EF.Reverse.POCO.Core.ttinclude" />

@@ -47,6 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Lookup\Lookup.FilterCriteria.cs" />
+    <Compile Include="Lookup\IMongoDbScriptProvider.cs" />
+    <Compile Include="Lookup\Lookup.cs" />
+    <Compile Include="Lookup\Lookup.Join.cs" />
+    <Compile Include="Lookup\Lookup.Match.cs" />
     <Compile Include="Serializers\DictionarySerializer.cs" />
     <Compile Include="Usages\MigrationBase.cs" />
     <Compile Include="Atributes\MongoCollectionAttribute.cs" />

@@ -28,6 +28,8 @@
             MongoClientProxy.SetConnectionString(MongoAddress);
             MongoHelper.InitializeMongo(new Migration100().GetMigrationsAssembly(),
                 MongoAddress, DbContext.DatabaseName, false);
+
+           // global::MongoDB.Driver.options
         }
 
         private static IEnumerable<TEntity> CreateMockData<TEntity>(int limit)
@@ -497,8 +499,8 @@
             Assert.IsNotNull(list);
         }
 
-        [TestMethod]
-        public void LookupTest()
+        //[TestMethod]
+        private void LookupExperimentTest()
         {
             var script = @"db.PersonAddress.aggregate([
             {$match: { Active: { $eq: true }, _id:{$ne: ObjectId('59563835645e2f41587c3204')} }},
@@ -584,6 +586,47 @@
             }
             
             Assert.Fail();
+        }
+
+        [TestMethod]
+        public void LookupSimpleTest()
+        {
+            var template = Lookup<Person>.Left(MongoClientProxy.Instance)
+                .Project(p => p.Description)
+                .Match().Equals(p => p.Active, true).And().Contains(p => p.Name, "aaa").EndMatch()
+                .Limit(10)
+                .OrderByDescending(p => p.Id);
+
+            string script = template.ToString();
+            var result = template
+                .Execute(d => d.To<Person>());
+
+            Assert.IsNotNull(script);
+        }
+
+        [TestMethod]
+        public void LookupComplexTest()
+        {
+            var template = Lookup<PersonAddress>.Left(MongoClientProxy.Instance)
+                    //.BatchSize(10)
+                    .Project(p => p.Id, p => p.PersonId, p => p.AddressId, p => p.Active)
+                    .Match().Equals(p => p.Active, true).And().NotEquals(p => p.Active, false).EndMatch()
+                    .LookUp<Person>().LocalField(p => p.PersonId).ForeignField(p => p.Id).EndLookup()
+                    .LookUp<Address>().LocalField(p => p.AddressId).ForeignField(p => p.Id).EndLookup()
+                 .Limit(50000)
+                 .OrderByDescending(p => p.Id);
+                ;
+            string script = template.ToString();
+
+            var result = template
+                .Execute(d => new {
+                    PersonAddress = d.To<PersonAddress>(),
+                    Person = d["Person"].To<Person>(),
+                    Address = d["Address"].To<Address>()
+                });
+
+            int count = result.Count;
+            Assert.AreNotEqual(count, 0);
         }
     }
 }
