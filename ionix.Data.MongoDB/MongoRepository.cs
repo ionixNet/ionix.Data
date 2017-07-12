@@ -82,10 +82,21 @@
         {
             return this.mongo.ReplaceOne(predicate, entity, options);
         }
+
+        public ReplaceOneResult ReplaceOrInsertOne(Expression<Func<TEntity, bool>> predicate, TEntity entity)
+        {
+            return this.mongo.ReplaceOrInsertOne(predicate, entity);
+        }
+
         //id value must be set.
         public ReplaceOneResult ReplaceOne(TEntity entity, UpdateOptions options = null)
         {
             return this.mongo.ReplaceOne(entity, options);
+        }
+
+        public ReplaceOneResult ReplaceOrInsertOne(TEntity entity)
+        {
+            return this.mongo.ReplaceOrInsertOne(entity);
         }
 
         public ReplaceOneResult ReplaceOne(TEntity entity, UpdateOptions options, params Expression<Func<TEntity, object>>[] filterFields)
@@ -93,19 +104,9 @@
             return this.mongo.ReplaceOne(entity, options, filterFields);
         }
 
-        /// <summary>
-        /// Replace or Insert
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="filterFields"></param>
-        /// <returns></returns>
-        public ReplaceOneResult ReplasertOne(TEntity entity, params Expression<Func<TEntity, object>>[] filterFields)
+        public ReplaceOneResult ReplaceOrInsertOne(TEntity entity, params Expression<Func<TEntity, object>>[] filterFields)
         {
-            return this.mongo.ReplaceOne(entity, new UpdateOptions() { IsUpsert = true }, filterFields);
-        }
-        public ReplaceOneResult ReplasertOne(TEntity entity)
-        {
-            return this.mongo.ReplaceOne(entity, new UpdateOptions() { IsUpsert = true });
+            return this.mongo.ReplaceOrInsertOne(entity, filterFields);
         }
 
         //waring: _id values in MongoDB documents are immutable. If you specify an _id in the replacement document, it must match the _id of the existing document.
@@ -113,9 +114,21 @@
         {
             return this.mongo.ReplaceOneAsync(predicate, entity, options);
         }
+
+        public Task<ReplaceOneResult> ReplaceOrInsertOneAsync(Expression<Func<TEntity, bool>> predicate, TEntity entity)
+        {
+            return this.mongo.ReplaceOrInsertOneAsync(predicate, entity);
+        }
+
+
         public Task<ReplaceOneResult> ReplaceOneAsync(TEntity entity, UpdateOptions options = null)
         {
             return this.mongo.ReplaceOneAsync(entity, options);
+        }
+
+        public Task<ReplaceOneResult> ReplaceOrInsertOneAsync(TEntity entity)
+        {
+            return this.mongo.ReplaceOrInsertOneAsync(entity);
         }
 
         #endregion

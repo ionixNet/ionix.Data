@@ -621,8 +621,8 @@
             var result = template
                 .Execute(d => new {
                     PersonAddress = d.To<PersonAddress>(),
-                    Person = d["Person"].To<Person>(),
-                    Address = d["Address"].To<Address>()
+                    Person = d.Unwind<Person>(),
+                    Address = d.Unwind<Address>()
                 });
 
             int count = result.Count;

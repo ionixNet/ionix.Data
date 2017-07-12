@@ -15,6 +15,8 @@
 
     public sealed class Mongo
     {
+        private static readonly UpdateOptions ReplaceOrInsertOptions = new UpdateOptions() { IsUpsert = true };
+
         private readonly IMongoClient client;
         public Mongo(IMongoClient client)
         {
@@ -132,11 +134,23 @@
         {
             return this.ReplaceOneInternal(predicate, entity, options);
         }
+
+        public ReplaceOneResult ReplaceOrInsertOne<TEntity>(Expression<Func<TEntity, bool>> predicate
+            , TEntity entity)
+        {
+            return this.ReplaceOne(predicate, entity, ReplaceOrInsertOptions);
+        }
+
         //id değeri var ise bunu kullan.
         public ReplaceOneResult ReplaceOne<TEntity>(TEntity entity, UpdateOptions options = null)
         {
             var idPi = GetIdProperty<TEntity>(true);
             return this.ReplaceOneInternal(GetIdFilterDefination<TEntity>(idPi.GetValue(entity)), entity, options);
+        }
+
+        public ReplaceOneResult ReplaceOrInsertOne<TEntity>(TEntity entity)
+        {
+            return this.ReplaceOne(entity, ReplaceOrInsertOptions);
         }
 
         public ReplaceOneResult ReplaceOne<TEntity>(TEntity entity, UpdateOptions options, params Expression<Func<TEntity, object>>[] filterFields)
@@ -161,6 +175,12 @@
             return this.ReplaceOneInternal<TEntity>(fd, entity, options);
         }
 
+        public ReplaceOneResult ReplaceOrInsertOne<TEntity>(TEntity entity,
+            params Expression<Func<TEntity, object>>[] filterFields)
+        {
+            return this.ReplaceOne(entity, ReplaceOrInsertOptions, filterFields);
+        }
+
 
 
         private Task<ReplaceOneResult> ReplaceOneInternalAsync<TEntity>(FilterDefinition<TEntity> filterDefination
@@ -178,11 +198,23 @@
         {
             return this.ReplaceOneInternalAsync(predicate, entity, options);
         }
+
+        public Task<ReplaceOneResult> ReplaceOrInsertOneAsync<TEntity>(Expression<Func<TEntity, bool>> predicate
+            , TEntity entity)
+        {
+            return this.ReplaceOneAsync(predicate, entity, ReplaceOrInsertOptions);
+        }
+
         //id değeri var ise bunu kullan.
         public Task<ReplaceOneResult> ReplaceOneAsync<TEntity>(TEntity entity, UpdateOptions options = null)
         {
             var idPi = GetIdProperty<TEntity>(true);
             return this.ReplaceOneInternalAsync(GetIdFilterDefination<TEntity>(idPi.GetValue(entity)), entity, options);
+        }
+
+        public Task<ReplaceOneResult> ReplaceOrInsertOneAsync<TEntity>(TEntity entity)
+        {
+            return this.ReplaceOneAsync(entity, ReplaceOrInsertOptions);
         }
 
         #endregion

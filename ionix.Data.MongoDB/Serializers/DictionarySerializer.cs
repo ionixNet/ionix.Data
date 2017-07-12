@@ -1,6 +1,7 @@
 ﻿namespace ionix.Data.MongoDB.Serializers
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reflection;
     using global::MongoDB.Bson;
@@ -21,28 +22,45 @@
             return pi.Name;
         }
 
-        //_id olmuyor.
+        private static readonly  IDictionary<Type, IDictionary<string, PropertyInfo>> _cache = 
+            new ConcurrentDictionary<Type, IDictionary<string, PropertyInfo>>();
+
+        private static readonly object _syscnRoot = new object();
         public static IDictionary<string, PropertyInfo> GetValidProperties(Type type)
         {
-            Dictionary<string, PropertyInfo> ret = new Dictionary<string, PropertyInfo>();
-            foreach (var pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            IDictionary<string, PropertyInfo> ret;
+            if (!_cache.TryGetValue(type, out ret))
             {
-                if (pi.GetCustomAttribute<BsonIgnoreAttribute>() != null)
-                    continue;
-
-                Type propertyType = pi.PropertyType;
-                bool isObjectIdType = propertyType == typeof(ObjectId) || propertyType == typeof(ObjectId?);
-                if (!isObjectIdType)
+                lock (_syscnRoot)
                 {
-                    if (!ReflectionExtensions.IsPrimitiveType(pi.PropertyType))
-                        continue;
+                    if (!_cache.TryGetValue(type, out ret))
+                    {
+                        ret = new Dictionary<string, PropertyInfo>();
+                        foreach (var pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                        {
+                            if (pi.GetCustomAttribute<BsonIgnoreAttribute>() != null)
+                                continue;
 
-                    if (ReflectionExtensions.IsEnumerable(pi.PropertyType))
-                        continue;
+                            Type propertyType = pi.PropertyType;
+                            bool isObjectIdType = propertyType == typeof(ObjectId) || propertyType == typeof(ObjectId?);
+                            if (!isObjectIdType)
+                            {
+                                if (!ReflectionExtensions.IsPrimitiveType(pi.PropertyType))
+                                    continue;
+
+                                if (ReflectionExtensions.IsEnumerable(pi.PropertyType))
+                                    continue;
+                            }
+
+                            ret[GetFieldName(pi)] = pi;
+                        }
+
+                        _cache.Add(type, ret);
+                    }
                 }
 
-                ret[GetFieldName(pi)] = pi;
             }
+
 
             return ret;
         }
@@ -88,9 +106,11 @@
             return (T)To(dic, typeof(T));
         }
 
-        public static T To<T>(this object dyn)
+        public static T Unwind<T>(this IDictionary<string, object> dic)
         {
-            return (T)To(dyn as IDictionary<string, object>, typeof(T));
+            var name = HelperExtensions.GetNames(typeof(T)).Name;
+            var dicInner = dic[name] as IDictionary<string, object>;
+            return To<T>(dicInner);
         }
     }
 }
