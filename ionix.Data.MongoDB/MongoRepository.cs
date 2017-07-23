@@ -148,10 +148,10 @@
             return this.mongo.UpdateOne(id, sets, options);
         }
 
-        public UpdateResult UpdateOne(TEntity entity
+        public UpdateResult UpdateOne(TEntity entity, UpdateOptions options
             , params Expression<Func<TEntity, object>>[] fields)
         {
-            return this.mongo.UpdateOne(entity, fields);
+            return this.mongo.UpdateOne(entity, options, fields);
         }
 
         public Task<UpdateResult> UpdateOneAsync(Expression<Func<TEntity, bool>> predicate,

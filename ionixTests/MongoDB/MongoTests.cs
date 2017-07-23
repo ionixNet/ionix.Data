@@ -351,7 +351,7 @@
                 asset.Name = "Mehmet 2";
                 asset.Description = "Gören 2";
 
-                Cmd.UpdateOne(asset, p => p.Name, p => p.Description);
+                Cmd.UpdateOne(asset, null, p => p.Name, p => p.Description);
             }
 
             Assert.IsTrue(result);

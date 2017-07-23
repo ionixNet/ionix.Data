@@ -242,7 +242,7 @@
             return this.Get<TEntity>().UpdateOne(filter, def, options);
         }
 
-        public UpdateResult UpdateOne<TEntity>(TEntity entity
+        public UpdateResult UpdateOne<TEntity>(TEntity entity, UpdateOptions options
             , params Expression<Func<TEntity, object>>[] fields)
         {
             if (null != entity && null != fields && 0 != fields.Length)
@@ -266,7 +266,7 @@
                     return bd;
                 };
 
-                return this.UpdateOne(idValue, sets, null);
+                return this.UpdateOne(idValue, sets, options);
             }
 
             return null;
@@ -294,6 +294,37 @@
 
             return this.Get<TEntity>().UpdateOneAsync(filter, def, options);
         }
+
+        public Task<UpdateResult> UpdateOneAsync<TEntity>(TEntity entity, UpdateOptions options
+            , params Expression<Func<TEntity, object>>[] fields)
+        {
+            if (null != entity && null != fields && 0 != fields.Length)
+            {
+                var idPi = GetIdProperty<TEntity>(true);
+                object idValue = idPi.GetValue(entity);
+
+                Func<UpdateDefinitionBuilder<TEntity>, UpdateDefinition<TEntity>> sets = (builder) =>
+                {
+                    Dictionary<string, object> dic = new Dictionary<string, object>(fields.Length);
+                    foreach (var exp in fields)
+                    {
+                        var pi = ReflectionExtensions.GetPropertyInfo(exp);
+                        if (null != pi)
+                        {
+                            dic[pi.Name] = pi.GetValue(entity);
+                        }
+                    }
+
+                    var bd = new BsonDocument("$set", new BsonDocument(dic));
+                    return bd;
+                };
+
+                return this.UpdateOneAsync(idValue, sets, options);
+            }
+
+            return null;
+        }
+
 
 
         public UpdateResult UpdateMany<TEntity>(Expression<Func<TEntity, bool>> filter,
