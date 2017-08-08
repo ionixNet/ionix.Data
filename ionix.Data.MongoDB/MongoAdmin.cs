@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Threading.Tasks;
     using global::MongoDB.Bson;
     using global::MongoDB.Driver;
     using Serializers;
@@ -25,6 +26,17 @@
         public static BsonDocument ExecuteScript(IMongoDatabase db, string script)
         {
             return ExecuteScript<BsonDocument>(db, script);
+        }
+
+        public static Task<TEntity> ExecuteScriptAsync<TEntity>(IMongoDatabase db, string script)
+        {
+            var command = new JsonCommand<TEntity>(ConvertToEvalScript(script));
+
+            return db.RunCommandAsync(command);
+        }
+        public static Task<BsonDocument> ExecuteScriptAsync(IMongoDatabase db, string script)
+        {
+            return ExecuteScriptAsync<BsonDocument>(db, script);
         }
 
         private static void EnsureClient(IMongoClient client)
@@ -73,29 +85,25 @@
             return client.GetDatabase(name);
         }
 
-        public static void CreateCollection<TEntity>(IMongoClient client)
-        {
-            var info = HelperExtensions.GetNames(typeof(TEntity));
-
-            var db = GetDatabase(client, info.Database);
-
-            db.CreateCollection(info.Name);
-        }
-
-        public static async void CreateCollectionAsync<TEntity>(IMongoClient client)
-        {
-            var info = HelperExtensions.GetNames(typeof(TEntity));
-
-            var db = GetDatabase(client, info.Database);
-
-            await db.CreateCollectionAsync(info.Name);
-        }
-
         public static IMongoCollection<TEntity> GetCollection<TEntity>(IMongoClient client)
         {
+            EnsureClient(client);
             var info = HelperExtensions.GetNames(typeof(TEntity));
             var db = GetDatabase(client, info.Database);
             var table = db.GetCollection<TEntity>(info.Name);
+            return table;
+        }
+
+
+        public static IMongoCollection<BsonDocument> GetCollection(IMongoClient client, Type entiyType)
+        {
+            EnsureClient(client);
+            if (null == entiyType)
+                throw  new ArgumentNullException(nameof(entiyType));
+
+            var info = HelperExtensions.GetNames(entiyType);
+            var db = GetDatabase(client, info.Database);
+            var table = db.GetCollection<BsonDocument>(info.Name);
             return table;
         }
 
